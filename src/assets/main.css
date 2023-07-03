@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* html, body {
+    font-family: 'DM Sans', sans-serif;
+} */
+
+.gradient-inner-warning {
+  position: absolute;
+  border-radius: 100%;
+  width: 5rem;
+  height: 5rem;
+  background-image: radial-gradient(rgb(129 140 248), transparent)
+}
+
+.gradient-outer-warning {
+  position: absolute;
+  border-radius: 100%;
+  width: 6rem;
+  height: 6rem;
+  background-image: radial-gradient(rgba(129, 141, 248, 0.487), transparent)
+}
+
+.gradient-inner-delete {
+  position: absolute;
+  border-radius: 100%;
+  width: 5rem;
+  height: 5rem;
+  background-image: radial-gradient(rgb(248, 129, 129), transparent)
+}
+
+.gradient-outer-delete {
+  position: absolute;
+  border-radius: 100%;
+  width: 6rem;
+  height: 6rem;
+  background-image: radial-gradient(rgba(248, 129, 129, 0.487), transparent)
+}
+
+::-webkit-scrollbar {
+  width: 0.6rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(243 244 246);
+  border-radius: 100vw;
+  border: 0.2rem solid #55565C;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(209 213 219);
+}
+
+::-webkit-scrollbar-track {
+  background-color: #55565C;
+  border-radius: 100vw;
+  margin-block: 1rem;
+}
+
+@supports (scrollbar-color: rgb(243 244 246) #55565C) {
+  * {
+    scrollbar-color: rgb(243 244 246) #55565C
+  }
+}
