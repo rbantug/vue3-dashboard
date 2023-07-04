@@ -16,7 +16,7 @@ import RevenueStatistics from './components/RevenueStatistics.vue';
     <a href="#card-info" class="absolute top-[-40px] left-0 bg-green-600 text-white p-2 z-[100] focus:top-0">Skip to main content</a>
     
     <div class="bg-gradient-to-r from-gray-700 to-gray-800 font-sans">
-      <div class="flex h-screen w-full max-w-[80rem] m-auto z-20">
+      <div class="flex h-screen w-full max-w-[80rem] min-w-[80rem] m-auto z-20">
       <LeftMenu />
       <div class="flex min-h-screen flex-1 flex-col rounded-l-[48px] bg-gray-800">
         <TopMenu />

@@ -5,6 +5,8 @@
     :show="dashboard.stateInvoicesViewAll"
     ariaLabelProp="all invoices"
     @close="closeModal"
+    ref="modalRef"
+    :close-btn-keyboard-trap="dashboard.invoiceData.length === 0"
   >
     <template #header>All Invoices</template>
     <template #default>
@@ -33,6 +35,7 @@
                 :invoice-list="invoiceArr"
                 :delete-is-visible="true"
                 @cancel-pending-invoice="checkPendings"
+
               />
             </div>
           </div>
@@ -63,6 +66,7 @@
                 :invoice-list="invoiceArr"
                 :delete-is-visible="true"
                 @delete-successful-invoice="checkSuccess"
+                @focus-modal-close-btn="focusModalCloseBtn"
               />
             </div>
           </div>
@@ -380,7 +384,6 @@ function formSubmit() {
 }
 
 function openModal(event) {
-  console.log(event.target.textContent)
   if (event.target.textContent.trim() === "View All") {
     dashboard.showInvoicesViewAll()
   }
@@ -439,6 +442,7 @@ function runPendingInvoiceBar(propId, notificationId) {
       outputPendingBar.value[`${propId}ST`] = setTimeout(() => {
         const getIndex = invoiceArr.value.findIndex((el) => el.id == propId);
         invoiceArr.value[getIndex].status = "Successful";
+        hasSuccess.value = true
         //outputPendingBar.value.removeProp(propId)
 
         // state management for "There are no pending invoices" message in All Invoices modal
@@ -521,6 +525,14 @@ function checkSuccess() {
   }
 
   invoiceArr.value = [...dashboard.invoiceData];
+}
+
+// BaseModal related code
+
+const modalRef = ref(null)
+
+function focusModalCloseBtn() {
+  modalRef.value?.focusCloseBtn()
 }
 
 onMounted(() => {

@@ -73,6 +73,15 @@ export const useDashboardStore = defineStore('dashboard', {
 
           this.invoiceData.splice(index, 1)
         },
+        updateInvData2BeRemoved(val) {
+          this.invoiceDataToBeRemoved = val
+        },
+        updateDelInvModalVisibility(val) {
+          this.deleteInvoiceModalIsVisible = val
+        },
+        updatePendingNotifyId(val) {
+          this.pendingNotifyIdDeleteInvoice = val
+        },
         updateOutputPendingBar(obj) {
           this.outputPendingBar = obj
         },
@@ -96,7 +105,7 @@ export const useDashboardStore = defineStore('dashboard', {
         closeDeleteTransferModal() {
           this.deleteTransferModalIsVisible = false
           this.deleteTransferCompany = ''
-        }
+        },
     }   
     
 })

@@ -1,7 +1,7 @@
 <template>
   <!-- Modal for confirmation when removing an invoice -->
 
-  <BaseWarningModal :warning-modal-is-visible="dashboard.deleteInvoiceModalIsVisible" @emit-yes-btn="deleteInvoiceAndCloseModal" @emit-no-btn="closeModal" modal-height="h-[16rem]" modal-width="w-[25rem] " icon-color="red">
+  <BaseWarningModal :warning-modal-is-visible="dashboard.deleteInvoiceModalIsVisible" @emit-yes-btn="yesBtn" @emit-no-btn="closeModal" modal-height="h-[16rem]" modal-width="w-[25rem] " icon-color="red">
     <template v-slot:default>
       <span class="text-center">Do you want to remove Invoice # {{ dashboard.invoiceDataToBeRemoved.id }}?</span>
     </template>
@@ -103,7 +103,7 @@
               </div>
             </div>
           </td>
-          <div v-if="props.deleteIsVisible" class="absolute -right-7 top-3 h-8 w-8 outline-none text-red-600/40 cursor-pointer hover:text-red-600 focus-visible:text-red-600 duration-300" @click="openModal(invoice, $event)" @keypress.enter="openModal(invoice, $event)" tabindex="0" :aria-label="`delete invoice #${invoice.id}`">
+          <div v-if="props.deleteIsVisible" class="absolute -right-7 top-3 h-8 w-8 outline-none text-red-600/40 cursor-pointer hover:text-red-600 focus-visible:text-red-600 duration-300" @click="openModal(invoice, $event)" @keypress.exact.enter="openModal(invoice, $event)" tabindex="0" :aria-label="`delete invoice #${invoice.id}`">
             <Icon icon="material-symbols:delete-outline" class="absolute left-1 top-1 h-6 w-6"/>
           </div>
         </tr>
@@ -137,7 +137,7 @@ const props = defineProps({
   status: {
     type: String,
     required: true,
-    default: "all", // options are 'all', 'pending' & 'successful'
+    default: "all", // options are 'all', 'pending' & 'successful'. There is an invoiceTable that will show both pending and successful invoices ("all") and 2 other invoicesTable with show either "pending" OR "successful".
   },
   tableWidth: {
     type: String,
@@ -154,18 +154,17 @@ const props = defineProps({
   },
   tableMaxHeight: {
     type: String,
-    required: false, // TailwindCSS
+    required: false, // tailwindCSS
   },
   deleteIsVisible: {
     type: Boolean,
     required: false,
-  }
+  },
 });
 
 const reactiveStatusProgObj = toRef(props, 'statusProgressObj')
-//const reactiveInvoiceList = toRef(props, 'invoiceList')
 
-const emits = defineEmits(['cancelPendingInvoice', 'deleteSuccessfulInvoice'])
+const emits = defineEmits(['cancelPendingInvoice', 'deleteSuccessfulInvoice', 'focusModalCloseBtn'])
 
 let invoiceArr = ref([...dashboard.invoiceData])
 
@@ -184,8 +183,11 @@ function updateInvoiceArr() {
 
 function deleteInvoice(invoice) {
   // if invoice status is pending, remove pending notification
-  dashboard.removeNotification(dashboard.pendingNotifyIdDeleteInvoice)
-  dashboard.pendingNotifyIdDeleteInvoice = 0
+
+  if(invoice.status === 'pending') {
+    dashboard.removeNotification(dashboard.pendingNotifyIdDeleteInvoice)
+    dashboard.updatePendingNotifyId(0)
+  }
 
   // create notification before removing the invoice
 
@@ -200,7 +202,6 @@ function deleteInvoice(invoice) {
     })
     dashboard.updateLastNotificationId(newNotificationId) 
 
-  
   // remove the invoice
 
   if(invoice.status === 'Pending') {
@@ -214,35 +215,33 @@ function deleteInvoice(invoice) {
     emits('deleteSuccessfulInvoice')
   }
 }
-
+//////////////////////
 // Modal confirmation when deleting an invoice
+//////////////////////
+
+let tempDeleteBtnRef = ref(null)
 
 function openModal(invoice, event) {
-  dashboard.invoiceDataToBeRemoved = invoice
-  dashboard.deleteInvoiceModalIsVisible = true
+  dashboard.updateInvData2BeRemoved(invoice)
+  dashboard.updateDelInvModalVisibility(true)
   tempDeleteBtnRef.value = event.target
 }
 
-const tempDeleteBtnRef = ref()
-
 function closeModal() {
-  dashboard.invoiceDataToBeRemoved = null
-  dashboard.deleteInvoiceModalIsVisible = false
-  //tempDeleteBtnRef.value.focus()
+  dashboard.updateDelInvModalVisibility(false)
+  tempDeleteBtnRef.value.focus()
 } 
-
-function deleteInvoiceAndCloseModal() {
-  deleteInvoice(dashboard.invoiceDataToBeRemoved)
-  closeModal()
-}
 
 function yesBtn() {
   deleteInvoice(dashboard.invoiceDataToBeRemoved)
   closeModal()
-  console.log(tempDeleteBtnRef.value.parentElement)
-}
 
-const refList = ref([])
+  if(dashboard.invoiceData.length !== 0) {
+    tempDeleteBtnRef.value.parentElement.parentElement.children[0].children[5].focus()
+  } else {
+    emits('focusModalCloseBtn')
+  }
+}
 
 // Misc
 

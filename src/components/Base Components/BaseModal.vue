@@ -96,7 +96,7 @@ function focusCloseBtn() {
     closeBtnRef.value.focus()
 }
 
-defineExpose({ closeBtnRef })
+defineExpose({ closeBtnRef, focusCloseBtn })
 </script>
   
 <style scoped>
