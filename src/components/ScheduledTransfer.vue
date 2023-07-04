@@ -116,20 +116,24 @@
                       class="h-7 w-[4.5rem] outline-none rounded-lg focus-visible:ring focus-visible:ring-white/50 z-10"
                       :class="{ 'text-gray-700': billingIsYearly }"
                       @click="changeBilling"
+                      @keydown.enter.exact.stop.prevent="changeBilling"
+                      @keydown.space.exact.stop.prevent="changeBilling"
                       ref="monthlyBtnRef"
-                      aria-selected="true"
+                      :aria-checked="billingMonthlyAriaChecked"
                       aria-label="Billing Cycle Monthly"
-                      role="option"
+                      role="switch"
                     >Monthly
                     </button>
                     <button
                       class="h-7 w-[4.5rem] outline-none rounded-lg focus-visible:ring focus-visible:ring-white/50 z-10"
                       :class="{ 'text-gray-700': billingIsMonthly }"
                       @click="changeBilling"
+                      @keydown.enter.exact.stop.prevent="changeBilling"
+                      @keydown.space.exact.stop.prevent="changeBilling"
                       ref="yearlyBtnRef"
-                      aria-selected="false"
+                      :aria-checked="billingYearlyAriaChecked"
                       aria-label="Billing Cycle Yearly"
-                      role="option"
+                      role="switch"
                     >Yearly
                     </button>
                     <div
@@ -806,18 +810,21 @@ const isActiveSubscription = computed(() =>
   currentSubscription.value.map((sub) => sub.company)
 );
 
+const billingMonthlyAriaChecked = ref(null)
+const billingYearlyAriaChecked = ref(null)
+
 function changeBilling(event) {
   newSubBilling.value = event.target.textContent.trim();
 
   if (event.target.textContent.trim() === "Monthly") {
-    monthlyBtnRef.value.ariaSelected = true;
-    yearlyBtnRef.value.ariaSelected = false;
+    billingMonthlyAriaChecked.value = true
+    billingYearlyAriaChecked.value = false
     durationErrorYear.value = false;
   }
 
   if (event.target.textContent.trim() === "Yearly") {
-    monthlyBtnRef.value.ariaSelected = false;
-    yearlyBtnRef.value.ariaSelected = true;
+    billingMonthlyAriaChecked.value = false
+    billingYearlyAriaChecked.value = true
     durationErrorMonth.value = false;
   }
 }
@@ -1209,6 +1216,16 @@ function selectEditTransfer(sub) {
 
   // Billing Cycle
   newSubBilling.value = selectedSubscriptionInfo.billing;
+
+  if(selectedSubscriptionInfo.billing === 'Monthly') {
+    billingMonthlyAriaChecked.value = true
+    billingYearlyAriaChecked.value = false
+  }
+
+  if(selectedSubscriptionInfo.billing === 'Yearly') {
+    billingMonthlyAriaChecked.value = false
+    billingYearlyAriaChecked.value = true
+  }
 
   // Duration
   const endDate = new Date(selectedSubscriptionInfo.subEndDate);
