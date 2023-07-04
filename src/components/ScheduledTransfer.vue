@@ -10,6 +10,7 @@
     }"
     :disable-close-btn="processNewSubscription"
     :close-btn-keyboard-trap="setModalCloseBtnKeyboardTrap"
+    :aria-label-prop="!editTransferModalIsVisible ? 'add new transfer' : 'edit existing transfer'"
     ref="baseModalRef"
   >
     <template #header>
@@ -502,6 +503,7 @@
           class="flex items-center gap-x-1 p-2 bg-gray-700 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="toggleModalNewTransfer"
           ref="addNewBtnRef"
+          aria-label="add new scheduled transfer"
         >
           <Icon icon="ic:baseline-plus" class="h-4 w-4" />
           <span class="text-sm ml-1">Add New</span>
@@ -526,9 +528,11 @@
             }"
             style="width: 7rem"
             @click="selectEditTransfer(sub)"
-            @keypress.enter="selectEditTransfer(sub)"
-            @keypress.space="selectEditTransfer(sub)"
+            @keydown.enter.exact.stop.prevent="selectEditTransfer(sub)"
+            @keydown.space.exact.stop.prevent="selectEditTransfer(sub)"
+            @keydown.escape.exact.stop.prevent="cancelEditTransfer"
             :tabindex="editTransferEnabled ? 0 : -1"
+            ref="carouselRefList"
           >
             <div
               class="absolute bg-gray-500 h-[3rem] w-[10rem] top-[-1rem]"
@@ -541,7 +545,7 @@
             <span class="text-white text-xs font-bold"
               >${{
                 sub.billing === "Monthly" ? sub.amountMonth : sub.amountYear
-              }}/{{ sub.billing === "Monthly" ? "m" : "yr" }}</span
+              }}/{{ sub.billing === "Monthly" ? "month" : "year" }}</span
             >
           </slide>
 
@@ -561,9 +565,12 @@
               !editTransferEnabled,
           }"
           @click="startEditTransfer"
+          @keydown.enter.exact.stop.prevent="startEditTransfer"
+          @keydown.space.exact.stop.prevent="startEditTransfer"
           ref="editBtnRef"
+          :aria-label="editTransferBtnLabel"
         >
-          {{ !editTransferEnabled ? "Edit Transfer" : "Cancel Edit" }}
+          {{ editTransferBtnLabel }}
         </button>
       </div>
     </div>
@@ -1161,9 +1168,27 @@ const durationMonthEditTransfer = ref();
 const durationYearNotVModel = ref();
 const reminderIndex = ref(0);
 const startMonthAndYear = ref({ month: null, year: null });
+const carouselRefList = ref([])
 
-function startEditTransfer() {
+const editTransferBtnLabel = computed(() => {
+  if(!editTransferEnabled.value) {
+    return "Edit Transfer"
+  } else {
+    return "Cancel Edit"
+  }
+})
+
+function startEditTransfer(e) {
   editTransferEnabled.value = !editTransferEnabled.value;
+
+  if(editTransferEnabled.value) {
+    carouselRefList.value[0].$el.focus()
+  }
+}
+
+function cancelEditTransfer() {
+  editTransferEnabled.value = false
+  editBtnRef.value.focus()
 }
 
 function selectEditTransfer(sub) {
@@ -1274,6 +1299,7 @@ function deleteTransfer() {
 }
 
 onMounted(() => {
+  carouselRefList.value = []
   createCarouselSubscription();
 });
 </script>

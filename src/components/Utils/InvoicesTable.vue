@@ -125,6 +125,7 @@ import { ref, computed, toRef } from 'vue'
 import BaseWarningModal from '../Base Components/BaseWarningModal.vue';
 import { useDashboardStore } from '../../stores/useDashboard';
 import { getRandomNumber } from '../../composables-and-reusable-logic/getRandomNumber';
+import { toast } from "vue3-toastify";
 
 const dashboard = useDashboardStore();
 
@@ -190,6 +191,13 @@ function deleteInvoice(invoice) {
   }
 
   // create notification before removing the invoice
+
+  toast.info(`Deleted invoice #${invoice.id}.`, {
+      autoClose: 3000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+      theme: "dark",
+      transition: toast.TRANSITIONS.SLIDE,
+    });
 
   const newNotificationId = dashboard.lastNotificationId + Math.floor(getRandomNumber(0, 500))
 

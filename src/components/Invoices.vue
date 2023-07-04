@@ -113,6 +113,7 @@
                     :src="slotObj.slotData.photo"
                     alt="client photo"
                     class="object-fit rounded-full h-7 w-7"
+                    aria-hidden="true"
                   />
                   <span
                     class="block truncate"
