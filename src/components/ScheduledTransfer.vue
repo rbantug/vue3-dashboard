@@ -160,14 +160,14 @@
                             : monthConditional
                         "
                         @emit-data="updateDurationMonth"
-                        aria-label-prop="month"
+                        aria-label-prop="Transfer duration, month."
                         width-prop="w-[8.5rem]"
                       />
                       <input
                         type="number"
                         class="w-20 h-9 pl-2 rounded-lg text-gray-900 text-sm focus:outline-none border-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-green-400 shadow-md duration-300"
                         v-model="durationYear"
-                        aria-label="year"
+                        aria-label="Transfer duration, year."
                       />
                     </div>
                     <Transition name="durationError">
@@ -559,6 +559,8 @@
         </carousel>
       </div>
 
+      <!-- Edit Button -->
+
       <div class="flex w-40">
         <button
           class="flex justify-center w-full py-2 bg-gray-700 text-white text-sm rounded-xl outline-none duration-200"
@@ -810,8 +812,8 @@ const isActiveSubscription = computed(() =>
   currentSubscription.value.map((sub) => sub.company)
 );
 
-const billingMonthlyAriaChecked = ref(null)
-const billingYearlyAriaChecked = ref(null)
+const billingMonthlyAriaChecked = ref(true)
+const billingYearlyAriaChecked = ref(false)
 
 function changeBilling(event) {
   newSubBilling.value = event.target.textContent.trim();
@@ -884,6 +886,8 @@ function updateDurationMonth(data) {
     (month) => month === durationMonth.value
   );
 }
+
+const ariaLabelMonth = computed(() => `Transfer duration, month. ${monthArr.value[monthConditional.value] || durationMonthEditTransfer.value}`)
 
 //////////////////
 // Reminder
