@@ -521,7 +521,7 @@
 
       <!-- Subscriptions Carousel -->
 
-      <div class="mb-4 mx-auto w-full">
+      <div class="mb-4 mx-auto w-[21rem]">
         <carousel
           :items-to-show="outputCarouselItemsToShow"
           class="flex justify-center"
