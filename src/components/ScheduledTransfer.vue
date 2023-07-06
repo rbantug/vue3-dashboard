@@ -65,13 +65,11 @@
           >
             <button
               v-if="!editTransferOptions"
-              class="flex items-center gap-x-2 text-white hover:cursor-pointer absolute top-4 left-6"
-              @click="
-                () => {
-                  newTransferOptions = false;
-                  selectSubscription = true;
-                }
-              "
+              class="flex items-center gap-x-2 pr-2 text-white hover:cursor-pointer absolute top-4 left-6"
+              @click="backBtnNewTransfer"
+              @keydown.enter.exact.stop.prevent="backBtnNewTransfer"
+              @keydown.space.exact.stop.prevent="backBtnNewTransfer"
+              aria-label="go back to the list of subscriptions"
             >
               <Icon
                 icon="material-symbols:arrow-back-ios-new-rounded"
@@ -332,8 +330,11 @@
           <div class="flex flex-col w-full relative">
             <button
               v-if="!processNewSubscription"
-              class="flex items-center gap-x-2 text-white hover:cursor-pointer absolute top-4 left-6"
+              class="flex items-center gap-x-2 pr-2 text-white hover:cursor-pointer absolute top-4 left-6"
               @click="backBtnSummaryWindow"
+              @keydown.enter.exact.stop.prevent="backBtnSummaryWindow"
+              @keydown.space.exact.stop.prevent="backBtnSummaryWindow"
+              aria-label="go back to transfer details"
             >
               <Icon
                 icon="material-symbols:arrow-back-ios-new-rounded"
@@ -409,7 +410,10 @@
           v-if="newTransferOptions || editTransferOptions"
           class="flex justify-center items-center py-2 pl-5 pr-3 bg-gray-900 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="subscriptionNextBtn"
+          @keydown.enter.exact.stop.prevent="subscriptionNextBtn"
+          @keydown.space.exact.stop.prevent="subscriptionNextBtn"
           @keydown.tab.exact="subscriptionNextBtnPreventDefault"
+          aria-label="go to transfer summary page"
         >
           <span class="text-md">Next</span>
           <Icon icon="ic:round-navigate-next" class="h-7 w-7" />
@@ -421,6 +425,7 @@
           @keypress.enter="openDeleteTransferModal"
           @keydown.tab.exact.prevent
           ref="deleteBtnRef"
+          aria-label="delete transfer"
         >
           <span class="text-md">Delete</span>
           <Icon icon="material-symbols:delete-outline" class="h-5 w-7" />
@@ -812,6 +817,11 @@ const isActiveSubscription = computed(() =>
   currentSubscription.value.map((sub) => sub.company)
 );
 
+function backBtnNewTransfer() {
+  newTransferOptions.value = false;
+  selectSubscription.value = true;
+}
+
 const billingMonthlyAriaChecked = ref(true)
 const billingYearlyAriaChecked = ref(false)
 
@@ -886,8 +896,6 @@ function updateDurationMonth(data) {
     (month) => month === durationMonth.value
   );
 }
-
-const ariaLabelMonth = computed(() => `Transfer duration, month. ${monthArr.value[monthConditional.value] || durationMonthEditTransfer.value}`)
 
 //////////////////
 // Reminder
@@ -1032,6 +1040,8 @@ function subscriptionNextBtn() {
     editTransferOptions.value = false;
   }
   subTransactSummary.value = true;
+  console.log(backBtnSummaryRef.value)
+  baseModalRef.value?.closeBtnRef.focus()
 }
 
 /////////////////////
