@@ -75,6 +75,11 @@ const props = defineProps({
         type: Boolean,
         required: false,
     },
+    closeBtnFocusOnPopup: {
+        type: Boolean,
+        required: false,
+        default: true,
+    }
 })
 
 const reactiveDisableCloseBtn = toRef(props, 'disableCloseBtn')
@@ -93,7 +98,9 @@ function handleEmitClose(e) {
     }
 }
 function focusCloseBtn() {
-    closeBtnRef.value.focus()
+    if(props.closeBtnFocusOnPopup) {
+        closeBtnRef.value.focus()
+    }
 }
 
 defineExpose({ closeBtnRef, focusCloseBtn })

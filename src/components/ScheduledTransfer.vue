@@ -10,6 +10,7 @@
     }"
     :disable-close-btn="processNewSubscription"
     :close-btn-keyboard-trap="setModalCloseBtnKeyboardTrap"
+    :close-btn-focus-on-popup="false"
     :aria-label-prop="!editTransferModalIsVisible ? 'add new transfer' : 'edit existing transfer'"
     ref="baseModalRef"
   >
@@ -39,9 +40,10 @@
             <li
               v-if="!isActiveSubscription.includes(company.company)"
               class="flex justify-center mt-5"
+              ref="subscriptionListRef"
             >
               <button
-                class="flex flex-col justify-center items-center w-20 h-20 rounded-md bg-gray-500 duration-300 hover:bg-white hover:ring-4 hover:ring-indigo-500"
+                class="flex flex-col justify-center items-center w-20 h-20 rounded-md bg-gray-500 duration-300 outline-none hover:bg-white hover:ring-4 hover:ring-indigo-500 focus-visible:bg-white focus-visible:ring-4 focus-visible:ring-indigo-500"
                 @click="goToTransferOptions"
                 :aria-label="company.company"
                 :data-company="company.company"
@@ -70,6 +72,7 @@
               @keydown.enter.exact.stop.prevent="backBtnNewTransfer"
               @keydown.space.exact.stop.prevent="backBtnNewTransfer"
               aria-label="go back to the list of subscriptions"
+              ref="backBtnTransferOptionsRef"
             >
               <Icon
                 icon="material-symbols:arrow-back-ios-new-rounded"
@@ -87,7 +90,7 @@
                 aria-hidden="true"
               />
             </div>
-            <h1 class="flex flex-col items-center text-white">
+            <h1 class="flex flex-col items-center text-white" aria-live="assertive">
               <span>{{ tempSelectedSubscription.company }}</span>
               <span class="text-xl font-bold"
                 >${{ outputPrice }} per {{ outputBillingText }}</span
@@ -242,6 +245,7 @@
               <div class="mt-10">
                 <div class="text-white mb-2">Payment Method</div>
                 <div class="flex flex-col gap-y-2">
+                  <ul class="flex flex-col gap-y-2">
                   <template v-for="card of paymentMethodArr" :key="card.id">
                     <div class="relative">
                       <input
@@ -302,6 +306,7 @@
                       </div>
                     </div>
                   </template>
+                </ul>
                   <a
                     href="#"
                     class="ring-2 ring-gray-400 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white hover:ring-2 hover:ring-white text-gray-300 hover:text-white focus-visible:text-white duration-300"
@@ -335,6 +340,7 @@
               @keydown.enter.exact.stop.prevent="backBtnSummaryWindow"
               @keydown.space.exact.stop.prevent="backBtnSummaryWindow"
               aria-label="go back to transfer details"
+              ref="backBtnSummaryWindowRef"
             >
               <Icon
                 icon="material-symbols:arrow-back-ios-new-rounded"
@@ -435,6 +441,7 @@
           class="flex justify-center items-center py-2 px-6 bg-gray-900 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="addSubscription('submit')"
           @keydown.tab.exact.prevent
+          aria-label="submit transaction"
         >
           <span class="text-md">Submit</span>
         </button>
@@ -446,16 +453,17 @@
         >
           <span class="text-md">Update</span>
         </button>
-        <button
+        <div
           v-if="subTransactSummary && processNewSubscription"
           class="flex justify-center items-center py-2 px-6 gap-x-2 bg-gray-900 text-gray-200 rounded-lg outline-none focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @keydown.tab.exact.prevent
-          disabled
-          role="alert"
+          tabindex="0"
+          ref="processingBtnRef"
+          aria-label="processing transfer"
         >
           <Icon icon="eos-icons:loading" class="h-6 w-6" />
           <span class="text-md">Processing...</span>
-        </button>
+        </div>
       </div>
     </template>
   </BaseModal>
@@ -524,6 +532,8 @@
       <div class="mb-4 mx-auto w-[21rem]">
         <carousel
           :items-to-show="outputCarouselItemsToShow"
+          snap-align="start"
+          item
           class="flex justify-center"
         >
           <slide
@@ -589,7 +599,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { Icon } from "@iconify/vue";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Navigation } from "vue3-carousel";
@@ -605,6 +615,11 @@ const dashboard = useDashboardStore();
 // Refs for focusing elements
 const addNewBtnRef = ref();
 const editBtnRef = ref();
+const baseModalRef = ref();
+const backBtnTransferOptionsRef = ref();
+const backBtnSummaryWindowRef = ref();
+const processingBtnRef = ref()
+const subscriptionListRef = ref([])
 
 const allCompanies = [
   {
@@ -738,6 +753,10 @@ const setModalCloseBtnKeyboardTrap = ref(false)
 // Add New Transfer
 /////////////////////////////////////
 
+function getFirstTransfer() {
+  return subscriptionListRef.value.find(transfer => transfer !== undefined)
+}
+
 function toggleModalNewTransfer() {
   // prevent the keyboard trap on the close button in the modal. The keyboard trap is for the success window at the end of the new transfer process. 
   setModalCloseBtnKeyboardTrap.value = false
@@ -771,6 +790,13 @@ function toggleModalNewTransfer() {
   descriptionVmodel.value = null;
   paymentNetworkVModel.value = paymentMethodArr.value[0];
 
+  if(addNewTransferModalIsVisible.value) {
+    nextTick(() => {
+      getFirstTransfer().children[0].focus()
+    })
+    
+  }
+
   if(!addNewTransferModalIsVisible.value) {
     addNewBtnRef.value.focus()
   }
@@ -790,6 +816,10 @@ function goToTransferOptions(event) {
   tempSelectedSubscription.value = allCompanies.find(
     (company) => company.company === event.target.dataset.company
   );
+  nextTick(() => {
+    backBtnTransferOptionsRef.value.focus()
+  })
+  
 }
 
 function createCarouselSubscription() {
@@ -820,6 +850,11 @@ const isActiveSubscription = computed(() =>
 function backBtnNewTransfer() {
   newTransferOptions.value = false;
   selectSubscription.value = true;
+
+  nextTick(() => {
+    getFirstTransfer().children[0].focus()
+  })
+  
 }
 
 const billingMonthlyAriaChecked = ref(true)
@@ -1040,8 +1075,10 @@ function subscriptionNextBtn() {
     editTransferOptions.value = false;
   }
   subTransactSummary.value = true;
-  console.log(backBtnSummaryRef.value)
-  baseModalRef.value?.closeBtnRef.focus()
+  //console.log(backBtnSummaryRef.value)
+  nextTick(() => {
+    backBtnSummaryWindowRef.value.focus()
+  })
 }
 
 /////////////////////
@@ -1055,6 +1092,9 @@ function backBtnSummaryWindow() {
     editTransferOptions.value = true;
   }
   subTransactSummary.value = false;
+  nextTick(() => {
+    monthlyBtnRef.value.focus()
+  })
 }
 
 const outputSummaryDuration = computed(() => {
@@ -1097,10 +1137,10 @@ const outputSummaryDuration = computed(() => {
 
 const processNewSubscription = ref(false);
 const showSuccessWindow = ref(false);
-const baseModalRef = ref()
 
 function addSubscription(type) {
   processNewSubscription.value = true;
+  nextTick(() => processingBtnRef.value.focus())
 
   function getSubEndDate() {
     if (newSubBilling.value === "Monthly") {
@@ -1271,6 +1311,8 @@ function selectEditTransfer(sub) {
   editTransferModalIsVisible.value = true;
   editTransferOptions.value = true;
   editTransferEnabled.value = false;
+
+  nextTick(() => monthlyBtnRef.value.focus())
 }
 
 // Delete Transfer
