@@ -1040,6 +1040,10 @@ function subscriptionNextBtn() {
 
   // show error message for selecting a date that is less than a month
 
+  if(!editTransferModalIsVisible.value) {
+    durationMonth.value = monthArr.value[monthConditional.value];
+  }
+
   const durationInMilliseconds = Date.parse(
     `${currentDate.getDate()} ${durationMonth.value} ${durationYear.value}`
   );
@@ -1075,7 +1079,6 @@ function subscriptionNextBtn() {
     editTransferOptions.value = false;
   }
   subTransactSummary.value = true;
-  //console.log(backBtnSummaryRef.value)
   nextTick(() => {
     backBtnSummaryWindowRef.value.focus()
   })
@@ -1285,6 +1288,7 @@ function selectEditTransfer(sub) {
   const endDate = new Date(selectedSubscriptionInfo.subEndDate);
 
   durationMonthEditTransfer.value = endDate.getMonth();
+  durationMonth.value = monthArr.value[durationMonthEditTransfer.value]
   durationYear.value = endDate.getFullYear();
   durationYearNotVModel.value = durationYear.value;
 
