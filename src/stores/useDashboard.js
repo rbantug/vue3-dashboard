@@ -91,13 +91,13 @@ export const useDashboardStore = defineStore('dashboard', {
         deleteTransferFromNotification(company) {
           this.deleteTransferModalIsVisible = true
           this.deleteTransferCompany = company
-          
         },
         removeTransferBtnFromNotification(companyName) {
           const index = this.notifications.findIndex(notify => notify.company === companyName
           )
-
-          this.notifications[index].showRemoveBtn = false
+          if(index !== -1) {
+            this.notifications[index].showRemoveBtn = false
+          }
         },
         openDeleteTransferModal() {
           this.deleteTransferModalIsVisible = true
