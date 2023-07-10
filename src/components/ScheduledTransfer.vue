@@ -489,7 +489,7 @@
   <!-- Warning dialog box regarding deleting subscription -->
 
   <BaseWarningModal
-    :warning-modal-is-visible="dashboard.deleteTransferModalIsVisible"
+    :warning-modal-is-visible="transferStore.deleteTransferModalIsVisible"
     @emit-yes-btn="deleteTransfer"
     @emit-no-btn="closeDeleteTransferModal"
     modal-height="h-[17rem]"
@@ -500,7 +500,7 @@
       <span class="text-center"
         >Do you want to remove
         {{
-          dashboard.deleteTransferCompany || tempSelectedSubscription.company
+          transferStore.deleteTransferCompany || tempSelectedSubscription.company
         }}
         from your list of subscriptions?</span
       >
@@ -609,8 +609,10 @@ import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 import { toast } from "vue3-toastify";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
 import { useDashboardStore } from "../stores/useDashboard";
+import { useTransferStore } from "../stores/useTransfer"
 
 const dashboard = useDashboardStore();
+const transferStore = useTransferStore();
 
 // Refs for focusing elements
 const addNewBtnRef = ref();
@@ -1324,18 +1326,18 @@ function selectEditTransfer(sub) {
 const deleteBtnRef = ref(null);
 
 function openDeleteTransferModal() {
-  dashboard.openDeleteTransferModal();
+  transferStore.openDeleteTransferModal();
 }
 
 function closeDeleteTransferModal() {
-  dashboard.closeDeleteTransferModal();
+  transferStore.closeDeleteTransferModal();
   deleteBtnRef.value.focus();
 }
 
 function deleteTransfer() {
   // get the company name for the notification and toast
   const companyToBeDeleted =
-    tempSelectedSubscription.value.company || dashboard.deleteTransferCompany;
+    tempSelectedSubscription.value.company || transferStore.deleteTransferCompany;
 
   // Remove the "Remove transfer" button from the "New transfer added notification"
   dashboard.removeTransferBtnFromNotification(companyToBeDeleted);
@@ -1372,7 +1374,7 @@ function deleteTransfer() {
   });
   dashboard.updateLastNotificationId(notificationId);
 
-  dashboard.closeDeleteTransferModal();
+  transferStore.closeDeleteTransferModal();
 }
 
 onMounted(() => {
