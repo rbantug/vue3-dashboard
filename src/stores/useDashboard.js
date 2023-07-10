@@ -17,8 +17,6 @@ export const useDashboardStore = defineStore('dashboard', {
         stateInvoicesViewAll,
         outputPendingBar,
         addedAccountsList,
-        deleteTransferModalIsVisible,
-        deleteTransferCompany,
     }),
     getters: {
         outputInvoiceData(state) {
@@ -88,23 +86,12 @@ export const useDashboardStore = defineStore('dashboard', {
         addNewAccount(acct) {
           this.addedAccountsList.push(acct)
         },
-        deleteTransferFromNotification(company) {
-          this.deleteTransferModalIsVisible = true
-          this.deleteTransferCompany = company
-        },
         removeTransferBtnFromNotification(companyName) {
           const index = this.notifications.findIndex(notify => notify.company === companyName
           )
           if(index !== -1) {
             this.notifications[index].showRemoveBtn = false
           }
-        },
-        openDeleteTransferModal() {
-          this.deleteTransferModalIsVisible = true
-        },
-        closeDeleteTransferModal() {
-          this.deleteTransferModalIsVisible = false
-          this.deleteTransferCompany = ''
         },
     }   
     
@@ -294,7 +281,3 @@ let stateInvoicesViewAll = false
 let outputPendingBar = null
 
 let addedAccountsList = []
-
-let deleteTransferModalIsVisible = false
-
-let deleteTransferCompany = ''
