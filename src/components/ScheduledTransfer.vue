@@ -32,7 +32,10 @@
       >
         <!-- List of Subscriptions -->
 
-        <ul
+        <ScheduledTransferList 
+          v-if="transferStore.selectSubscription"
+        />
+        <!-- <ul
           v-if="selectSubscription"
           class="grid grid-cols-3 grid-rows-3 gap-y-2 w-[80%] mx-auto"
         >
@@ -57,7 +60,7 @@
               </button>
             </li>
           </template>
-        </ul>
+        </ul> -->
 
         <!-- New Transfer Options -->
         <!-- Also reused when editing an existing transfer -->
@@ -611,6 +614,8 @@ import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumb
 import { useDashboardStore } from "../stores/useDashboard";
 import { useTransferStore } from "../stores/useTransfer"
 
+import ScheduledTransferList from './ScheduledTransferList.vue'
+
 const dashboard = useDashboardStore();
 const transferStore = useTransferStore();
 
@@ -659,11 +664,11 @@ function toggleModalNewTransfer() {
   addNewTransferModalIsVisible.value = !addNewTransferModalIsVisible.value;
 
   // reset ALL state inside add new AND edit subscription modal
-  tempSelectedSubscription.value = [];
-  selectSubscription.value = true;
-  newTransferOptions.value = false;
-  subTransactSummary.value = false;
-  showSuccessWindow.value = false;
+  transferStore.updateTempSelectedSubscription(null);
+  transferStore.updateSelectSubscription(true);
+  transferStore.updateNewTransferOptions(false);
+  transferStore.updateSubTransactSummary(false);
+  transferStore.updateShowSuccessWindow(false);
   newSubBilling.value = "Monthly";
   monthConditional.value =
     currentMonth.value !== 11 ? currentMonth.value + 1 : 0;
@@ -676,12 +681,12 @@ function toggleModalNewTransfer() {
   descriptionVmodel.value = null;
   paymentNetworkVModel.value = paymentMethodArr.value[0];
 
-  if(addNewTransferModalIsVisible.value) {
+  /* if(addNewTransferModalIsVisible.value) {
     nextTick(() => {
       getFirstTransfer().children[0].focus()
     })
     
-  }
+  } */
 
   if(!addNewTransferModalIsVisible.value) {
     addNewBtnRef.value.focus()
@@ -692,11 +697,11 @@ function toggleModalNewTransfer() {
   }
 
   // edit subscription related states
-  editTransferModalIsVisible.value = false;
-  editTransferOptions.value = false;
+  transferStore.updateEditTransferModalIsVisible(false);
+  transferStore.updateEditTransferOptions(false);
 }
 
-function goToTransferOptions(event) {
+/* function goToTransferOptions(event) {
   selectSubscription.value = false;
   newTransferOptions.value = true;
   tempSelectedSubscription.value = transferStore.allCompanies.find(
@@ -706,7 +711,7 @@ function goToTransferOptions(event) {
     backBtnTransferOptionsRef.value.focus()
   })
   
-}
+} */
 
 function createCarouselSubscription() {
   carouselSubscription.value = [];
@@ -729,9 +734,9 @@ const outputCarouselItemsToShow = computed(() => {
   }
 });
 
-const isActiveSubscription = computed(() =>
+/* const isActiveSubscription = computed(() =>
 transferStore.currentSubscription.map((sub) => sub.company)
-);
+); */
 
 function backBtnNewTransfer() {
   newTransferOptions.value = false;
