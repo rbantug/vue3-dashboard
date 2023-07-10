@@ -5,7 +5,14 @@ export const useTransferStore = defineStore("transfer", {
     deleteTransferModalIsVisible,
     deleteTransferCompany,
     allCompanies,
-    currentSubscription
+    currentSubscription,
+    selectSubscription,
+    newTransferOptions,
+    editTransferOptions,
+    editTransferModalIsVisible,
+    subTransactSummary,
+    showSuccessWindow,
+    tempSelectedSubscription,
   }),
   actions: {
     deleteTransferFromNotification(company) {
@@ -19,9 +26,30 @@ export const useTransferStore = defineStore("transfer", {
       this.deleteTransferModalIsVisible = false;
       this.deleteTransferCompany = "";
     },
-    updateCurrentSubscription(val) {
-      this.currentSubscription = val
+    updateCurrentSubscription(array) {
+      this.currentSubscription = array
     },
+    updateSelectSubscription(boolean) {
+      this.selectSubscription = boolean
+    },
+    updateNewTransferOptions(boolean) {
+      this.newTransferOptions = boolean
+    },
+    updateEditTransferOptions(boolean) {
+      this.editTransferOptions = boolean
+    },
+    updateEditTransferModalIsVisible(boolean) {
+      this.editTransferModalIsVisible = boolean
+    },
+    updateSubTransactSummary(boolean) {
+      this.subTransactSummary = boolean
+    },
+    updateShowSuccessWindow(boolean) {
+      this.showSuccessWindow = boolean
+    },
+    updateTempSelectedSubscription(obj) {
+      this.tempSelectedSubscription = obj
+    }
   },
 });
 
@@ -144,3 +172,17 @@ const currentSubscription = [
     paymentMethodId: "9023953423",
   },
 ];
+
+let selectSubscription = false
+
+let newTransferOptions = false
+
+let editTransferOptions = false
+
+let editTransferModalIsVisible = false
+
+let subTransactSummary = false
+
+let showSuccessWindow = false
+
+let tempSelectedSubscription = null
