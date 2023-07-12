@@ -13,6 +13,7 @@ export const useTransferStore = defineStore("transfer", {
     editTransferModalIsVisible,
     subTransactSummary,
     showSuccessWindow,
+    processNewSubscription,
     tempSelectedSubscription,
     newSubBilling,
     durationErrorYear,
@@ -25,6 +26,7 @@ export const useTransferStore = defineStore("transfer", {
     durationMonth,
     durationYear,
     monthArr,
+    totalDurationMonths,
     warningModalIsVisible,
     checkboxState,
     reminderChoice,
@@ -71,6 +73,11 @@ export const useTransferStore = defineStore("transfer", {
       this.showSuccessWindow = boolean
     },
 
+    // Update the state used at the button found at the bottom of the modal
+    updateProcessNewSubscription(boolean) {
+      this.processNewSubscription = boolean
+    },
+
     // Update state used mostly in ScheduledTransferList.vue
     updateTempSelectedSubscription(obj) {
       this.tempSelectedSubscription = obj
@@ -92,8 +99,14 @@ export const useTransferStore = defineStore("transfer", {
     updateDurationMonth(monthString) {
       this.durationMonth = monthString
     },
+    updateDurationYear(number) {
+      this.durationYear = number
+    },
     updateMonthConditional(number) {
       this.monthConditional = number
+    },
+    updateTotalDurationMonths(number) {
+      this.totalDurationMonths = number
     },
     updateWarningModalIsVisible(boolean) {
       this.warningModalIsVisible = boolean
@@ -104,7 +117,23 @@ export const useTransferStore = defineStore("transfer", {
     updateReminderChoice(string) {
       this.reminderChoice = string
     },
+    updateDescriptionVmodel(string) {
+      this.descriptionVmodel = string
+    },
+    updatePaymentNetworkVModel(val) {
+      this.paymentNetworkVModel = val
+    },
   },
+  getters: {
+    outputBillingText(state) {
+      return state.newSubBilling === "Monthly" ? "month" : "year"
+    },
+    outputPrice(state) {
+      if (state.newSubBilling === "Monthly") return state.tempSelectedSubscription.amountMonth;
+
+      if (state.newSubBilling === "Yearly") return state.tempSelectedSubscription.amountYear;
+    }
+  }
 });
 
 let deleteTransferModalIsVisible = false;
@@ -253,6 +282,9 @@ let editTransferOptions = false
 let subTransactSummary = false
 let showSuccessWindow = false
 
+// State that controls the visibility of the buttons found at the bottom of the modal
+let processNewSubscription = false
+
 // State that is mostly used in ScheduledTransferList.vue
 let tempSelectedSubscription = null
 
@@ -268,6 +300,7 @@ const currentYear = currentDate.getFullYear();
 const monthConditional = currentMonth !== 11 ? currentMonth + 1 : 0
 let durationYear = currentYear
 let durationMonth = monthArr[monthConditional]
+let totalDurationMonths = 0
 
 let checkboxState = false
 let reminderChoice = ''

@@ -28,7 +28,7 @@
       <h1 class="flex flex-col items-center text-white" aria-live="assertive">
         <span>{{ transferStore.tempSelectedSubscription.company }}</span>
         <span class="text-xl font-bold"
-          >${{ outputPrice }} per {{ outputBillingText }}</span
+          >${{ transferStore.outputPrice }} per {{ transferStore.outputBillingText }}</span
         >
         <template v-if="transferStore.editTransferModalIsVisible">
         <span
@@ -269,7 +269,7 @@
     <!-- Warning dialog box regarding subscription duratrion -->
 
   <BaseWarningModal
-    :warning-modal-is-visible="warningModalIsVisible"
+    :warning-modal-is-visible="transferStore.warningModalIsVisible"
     @emit-yes-btn="goToSubTransactSummary"
     @emit-no-btn="closeWarningModal"
     modal-height="h-[21rem]"
@@ -315,6 +315,7 @@ import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumb
 import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 import { useTransferStore } from "../stores/useTransfer";
+import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
 
 const transferStore = useTransferStore();
 
@@ -322,15 +323,15 @@ const emits = defineEmits(['emitCreateCarouselSubscription'])
 
 function resetOptionsData() {
     transferStore.updateNewSubBilling = 'Monthly'
-  monthConditional.value = currentMonth.value !== 11 ? currentMonth.value + 1 : 0;
-  durationYear.value = currentYear;
-  durationErrorMonth.value = false;
-  durationErrorYear.value = false;
-  durationErrorCurrentYear.value = false;
-  checkboxState.value = false;
-  reminderChoice.value = "one day";
-  descriptionVmodel.value = null;
-  paymentNetworkVModel.value = paymentMethodArr.value[0];
+  transferStore.updateMonthConditional(currentMonth.value !== 11 ? currentMonth.value + 1 : 0)
+  transferStore.updateDurationYear(currentYear)
+  transferStore.updateDurationErrorMonth(false)
+  transferStore.updateDurationErrorYear(false)
+  transferStore.updateDurationErrorCurrentYear(false)
+  transferStore.updateCheckboxState(false)
+  transferStore.updateReminderChoice("one day")
+  transferStore.updateDescriptionVmodel(null)
+  transferStore.updatePaymentNetworkVModel(paymentMethodArr.value[0]);
 }
 
 function backBtnNewTransfer() {
@@ -366,18 +367,6 @@ function changeBilling(event) {
 const billingIsMonthly = computed(() => transferStore.newSubBilling === "Monthly");
 
 const billingIsYearly = computed(() => transferStore.newSubBilling === "Yearly");
-
-const outputBillingText = computed(() =>
-transferStore.newSubBilling === "Monthly" ? "month" : "year"
-);
-
-const outputPrice = computed(() => {
-  if (transferStore.newSubBilling === "Monthly")
-    return transferStore.tempSelectedSubscription.amountMonth;
-
-  if (transferStore.newSubBilling === "Yearly")
-    return transferStore.tempSelectedSubscription.amountYear;
-});
 
 ///////////////
 // Duration
@@ -477,9 +466,9 @@ function ariaLabelPaymentMethod(card) {
   }`;
 }
 
-function outputLast4CardNum(srcData) {
+/* function outputLast4CardNum(srcData) {
   return srcData.cardNumber.slice(15, srcData.cardNumber.length);
-}
+} */
 
 //////////////////////////
 // Warning Dialog Box

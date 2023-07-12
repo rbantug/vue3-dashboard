@@ -2,21 +2,21 @@
   <!-- Add new and edit subscription  -->
 
   <BaseModal
-    :show="addNewTransferModalIsVisible"
+    :show="transferStore.addNewTransferModalIsVisible"
     @close="toggleModalNewTransfer"
     :dialog-custom-y-position="{
-      'top-[20vh]': !editTransferModalIsVisible,
-      'top-[13vh]': editTransferModalIsVisible,
+      'top-[20vh]': !transferStore.editTransferModalIsVisible,
+      'top-[13vh]': transferStore.editTransferModalIsVisible,
     }"
-    :disable-close-btn="processNewSubscription"
+    :disable-close-btn="transferStore.processNewSubscription"
     :close-btn-keyboard-trap="setModalCloseBtnKeyboardTrap"
     :close-btn-focus-on-popup="false"
-    :aria-label-prop="!editTransferModalIsVisible ? 'add new transfer' : 'edit existing transfer'"
+    :aria-label-prop="!transferStore.editTransferModalIsVisible ? 'add new transfer' : 'edit existing transfer'"
     ref="baseModalRef"
   >
     <template #header>
       {{
-        !editTransferModalIsVisible
+        !transferStore.editTransferModalIsVisible
           ? "Add New Transfer"
           : "Edit Existing Transfer"
       }}
@@ -25,8 +25,8 @@
       <div
         class="w-full h-[28rem] bg-gray-900 rounded-md"
         :class="{
-          'h-[28rem]': !editTransferModalIsVisible,
-          'h-[32rem]': editTransferModalIsVisible && editTransferOptions,
+          'h-[28rem]': !transferStore.editTransferModalIsVisible,
+          'h-[32rem]': transferStore.editTransferModalIsVisible && editTransferOptions,
           'h-[28rem]': editTransferModalIsVisible && !editTransferOptions,
         }"
       >
@@ -336,7 +336,10 @@
 
         <!-- Subscription Transaction Summary -->
 
-        <div v-if="subTransactSummary">
+        <ScheduledTransferSummary 
+          v-if="transferStore.subTransactSummary"
+        />
+        <!-- <div v-if="subTransactSummary">
           <div class="flex flex-col w-full relative">
             <button
               v-if="!processNewSubscription"
@@ -395,7 +398,7 @@
               >
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Success Window -->
         <div v-if="showSuccessWindow">
@@ -430,7 +433,7 @@
           <Icon icon="ic:round-navigate-next" class="h-7 w-7" />
         </button>
         <button
-          v-if="editTransferOptions"
+          v-if="transferStore.editTransferOptions"
           class="flex justify-center items-center py-2 pl-5 pr-3 bg-gray-900 text-red-400 rounded-lg outline-none hover:ring-1 focus-visible:ring-1 focus-visible:ring-red-400 hover:ring-red-400 hover:text-red-400 duration-300"
           @click="transferStore.openDeleteTransferModal()"
           @keypress.enter="transferStore.openDeleteTransferModal()"
@@ -442,7 +445,7 @@
           <Icon icon="material-symbols:delete-outline" class="h-5 w-7" />
         </button>
         <button
-          v-if="subTransactSummary && !editTransferModalIsVisible && !processNewSubscription"
+          v-if="transferStore.subTransactSummary && !transferStore.editTransferModalIsVisible && !transferStore.processNewSubscription"
           class="flex justify-center items-center py-2 px-6 bg-gray-900 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="addSubscription('submit')"
           @keydown.tab.exact.prevent
@@ -451,7 +454,7 @@
           <span class="text-md">Submit</span>
         </button>
         <button
-          v-if="subTransactSummary && editTransferModalIsVisible && !processNewSubscription"
+          v-if="transferStore.subTransactSummary && transferStore.editTransferModalIsVisible && !transferStore.processNewSubscription"
           class="flex justify-center items-center py-2 px-6 bg-gray-900 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="addSubscription('update')"
           @keydown.tab.exact.prevent
@@ -459,7 +462,7 @@
           <span class="text-md">Update</span>
         </button>
         <div
-          v-if="subTransactSummary && processNewSubscription"
+          v-if="transferStore.subTransactSummary && transferStore.processNewSubscription"
           class="flex justify-center items-center py-2 px-6 gap-x-2 bg-gray-900 text-gray-200 rounded-lg outline-none focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @keydown.tab.exact.prevent
           tabindex="0"
@@ -618,6 +621,7 @@ import { useTransferStore } from "../stores/useTransfer"
 
 import ScheduledTransferList from "./ScheduledTransferList.vue"
 import ScheduledTransferOptions from "./ScheduledTransferOptions.vue";
+import ScheduledTransferSummary from "./ScheduledTransferSummary.vue";
 
 const dashboard = useDashboardStore();
 const transferStore = useTransferStore();
@@ -659,7 +663,7 @@ function toggleModalNewTransfer() {
   setModalCloseBtnKeyboardTrap.value = false
 
   // prevent modal from being closed while the new transfer/subscription is being processed
-  if (processNewSubscription.value) return;
+  if (transferStore.processNewSubscription) return;
 
   // Edit transfer button will be reverted back to its default state
   if (editTransferEnabled.value) {
@@ -667,7 +671,7 @@ function toggleModalNewTransfer() {
   }
 
   // toggle add new subscription modal visibility
-  addNewTransferModalIsVisible.value = !addNewTransferModalIsVisible.value;
+  transferStore.updateAddNewTransferModalIsVisible(!transferStore.addNewTransferModalIsVisible)
 
   // reset ALL state inside add new AND edit subscription modal
   transferStore.updateTempSelectedSubscription(null);
@@ -948,11 +952,12 @@ function subscriptionNextBtn() {
 
   const monthToMillliseconds = 2629800000;
 
-  totalDurationMonths.value = Math.round(
+  const tempTDM = Math.round(
     (durationInMilliseconds - transferStore.currentDate) / monthToMillliseconds
   );
+  transferStore.updateTotalDurationMonths(tempTDM)
 
-  if (totalDurationMonths.value < 1) {
+  if (transferStore.totalDurationMonths < 1) {
     transferStore.updateDurationErrorMonth(true)
     return;
   }
@@ -965,7 +970,7 @@ function subscriptionNextBtn() {
 
   // if billing cycle is per month and client opted to subscribe for a year or more, show a dialog box to inform client that they can choose to pay per year at a discounted price
 
-  if (transferStore.newSubBilling === "Monthly" && totalDurationMonths.value > 11) {
+  if (transferStore.newSubBilling === "Monthly" && transferStore.totalDurationMonths > 11) {
     transferStore.updateWarningModalIsVisible(true)
     return;
   }
@@ -986,7 +991,7 @@ function subscriptionNextBtn() {
 // Subscription Summary Page
 /////////////////////
 
-function backBtnSummaryWindow() {
+/* function backBtnSummaryWindow() {
   if (!editTransferModalIsVisible.value) {
     newTransferOptions.value = true;
   } else {
@@ -1034,26 +1039,26 @@ const outputSummaryDuration = computed(() => {
   if (newSubBilling.value === "Yearly") {
     return `${tempYearInteger} year${tempYearInteger > 1 ? "s" : ""}`;
   }
-});
+}); */
 
-const processNewSubscription = ref(false);
-const showSuccessWindow = ref(false);
+/* const processNewSubscription = ref(false);
+const showSuccessWindow = ref(false); */
 
 function addSubscription(type) {
-  processNewSubscription.value = true;
-  nextTick(() => processingBtnRef.value.focus())
+  transferStore.updateProcessNewSubscription(true)
+  /* nextTick(() => processingBtnRef.value.focus()) */
 
   function getSubEndDate() {
-    if (newSubBilling.value === "Monthly") {
+    if (transferStore.newSubBilling === "Monthly") {
       return Date.parse(
-        `${currentDate.getDate()} ${durationMonth.value} ${durationYear.value}`
+        `${transferStore.currentDate.getDate()} ${transferStore.durationMonth} ${transferStore.durationYear}`
       );
     }
 
-    if (newSubBilling.value === "Yearly") {
+    if (transferStore.newSubBilling === "Yearly") {
       return Date.parse(
-        `${currentDate.getDate()} ${monthArr.value[currentDate.getMonth()]} ${
-          durationYear.value
+        `${transferStore.currentDate.getDate()} ${transferStore.monthArr[transferStore.currentDate.getMonth()]} ${
+          transferStore.durationYear
         }`
       );
     }
@@ -1062,30 +1067,30 @@ function addSubscription(type) {
   setTimeout(() => {
     let notificationMsg = ''
     const data = {
-      company: tempSelectedSubscription.value.company,
-      billing: newSubBilling.value,
+      company: transferStore.tempSelectedSubscription.company,
+      billing: transferStore.newSubBilling,
       subStartDate: Date.now(),
       subEndDate: getSubEndDate(),
-      reminderIsActive: checkboxState.value,
-      reminderMsg: !checkboxState.value ? "none" : reminderChoice.value,
-      description: descriptionVmodel.value,
-      paymentMethodId: paymentNetworkVModel.value.id,
+      reminderIsActive: transferStore.checkboxState,
+      reminderMsg: !transferStore.checkboxState ? "none" : transferStore.reminderChoice,
+      description: transferStore.descriptionVmodel,
+      paymentMethodId: transferStore.paymentNetworkVModel.id,
     }
 
     if(type === 'submit') {
       transferStore.currentSubscription.unshift(data);
-      notificationMsg = `${tempSelectedSubscription.value.company} was added to your scheduled transfer`
+      notificationMsg = `${transferStore.tempSelectedSubscription.company} was added to your scheduled transfer`
     }
 
     if(type === 'update') {
-      const index = transferStore.currentSubscription.findIndex(sub => sub.company === tempSelectedSubscription.value.company)
+      const index = transferStore.currentSubscription.findIndex(sub => sub.company === transferStore.tempSelectedSubscription.company)
       transferStore.currentSubscription[index] = data
-      notificationMsg = `${tempSelectedSubscription.value.company} subscription details were updated. ` 
+      notificationMsg = `${transferStore.tempSelectedSubscription.company} subscription details were updated. ` 
     }
 
-    subTransactSummary.value = false;
-    processNewSubscription.value = false;
-    showSuccessWindow.value = true;
+    transferStore.updateSubTransactSummary(false)
+    transferStore.updateProcessNewSubscription(false)
+    transferStore.updateShowSuccessWindow(true)
     setModalCloseBtnKeyboardTrap.value = true
     baseModalRef.value?.closeBtnRef.focus()
 
@@ -1108,7 +1113,7 @@ function addSubscription(type) {
       id: notificationId,
       type: "transfer",
       status: "successful",
-      company: tempSelectedSubscription.value.company,
+      company: transferStore.tempSelectedSubscription.company,
       message: notificationMsg,
       showCancelBtn: false,
       showRemoveBtn: true,
