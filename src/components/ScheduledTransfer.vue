@@ -64,7 +64,13 @@
 
         <!-- New Transfer Options -->
         <!-- Also reused when editing an existing transfer -->
-        <div v-if="newTransferOptions || editTransferOptions">
+
+        <ScheduledTransferOptions 
+          v-if="transferStore.newTransferOptions || transferStore.editTransferOptions"
+          @emit-create-carousel-subscription="createCarouselSubscription"
+          ref="scheduledTransferOptionsRef"
+        />
+        <!-- <div v-if="newTransferOptions || editTransferOptions">
           <div
             class="flex flex-col justify-center items-center w-full relative"
           >
@@ -109,7 +115,7 @@
             </h1>
             <div class="flex w-[90%]">
               <div class="flex flex-col w-full mt-10 text-white gap-y-4">
-                <!-- Billing Cycle -->
+
 
                 <div class="flex items-center gap-x-2">
                   <div>Billing Cycle</div>
@@ -150,7 +156,7 @@
                   </div>
                 </div>
 
-                <!-- Duration -->
+
                 <div class="flex gap-x-2 items-center h-16">
                   <div>Duration</div>
                   <div>
@@ -204,7 +210,6 @@
                   </div>
                 </div>
 
-                <!-- Reminder -->
 
                 <div class="flex items-center gap-x-2 h-8">
                   <label for="reminder">Reminder</label>
@@ -224,8 +229,6 @@
                   />
                 </div>
 
-                <!-- Description -->
-
                 <div>
                   <label for="description" class="flex items-center gap-x-1">
                     <div>Description</div>
@@ -243,7 +246,6 @@
                 </div>
               </div>
 
-              <!-- Payment Method -->
 
               <div class="mt-10">
                 <div class="text-white mb-2">Payment Method</div>
@@ -330,7 +332,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Subscription Transaction Summary -->
 
@@ -416,7 +418,7 @@
 
       <div class="flex justify-center gap-x-2 mt-4 h-10">
         <button
-          v-if="newTransferOptions || editTransferOptions"
+          v-if="transferStore.newTransferOptions || transferStore.editTransferOptions"
           class="flex justify-center items-center py-2 pl-5 pr-3 bg-gray-900 text-gray-200 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
           @click="subscriptionNextBtn"
           @keydown.enter.exact.stop.prevent="subscriptionNextBtn"
@@ -430,8 +432,8 @@
         <button
           v-if="editTransferOptions"
           class="flex justify-center items-center py-2 pl-5 pr-3 bg-gray-900 text-red-400 rounded-lg outline-none hover:ring-1 focus-visible:ring-1 focus-visible:ring-red-400 hover:ring-red-400 hover:text-red-400 duration-300"
-          @click="openDeleteTransferModal"
-          @keypress.enter="openDeleteTransferModal"
+          @click="transferStore.openDeleteTransferModal()"
+          @keypress.enter="transferStore.openDeleteTransferModal()"
           @keydown.tab.exact.prevent
           ref="deleteBtnRef"
           aria-label="delete transfer"
@@ -473,7 +475,7 @@
 
   <!-- Warning dialog box regarding subscription duratrion -->
 
-  <BaseWarningModal
+  <!-- <BaseWarningModal
     :warning-modal-is-visible="warningModalIsVisible"
     @emit-yes-btn="goToSubTransactSummary"
     @emit-no-btn="closeWarningModal"
@@ -487,11 +489,11 @@
         for a year or more on your subscription.</span
       ><span>Do you still want to proceed?</span>
     </template>
-  </BaseWarningModal>
+  </BaseWarningModal> -->
 
   <!-- Warning dialog box regarding deleting subscription -->
 
-  <BaseWarningModal
+  <!-- <BaseWarningModal
     :warning-modal-is-visible="transferStore.deleteTransferModalIsVisible"
     @emit-yes-btn="deleteTransfer"
     @emit-no-btn="closeDeleteTransferModal"
@@ -508,7 +510,7 @@
         from your list of subscriptions?</span
       >
     </template>
-  </BaseWarningModal>
+  </BaseWarningModal> -->
 
   <!-- Main Component -->
 
@@ -614,10 +616,14 @@ import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumb
 import { useDashboardStore } from "../stores/useDashboard";
 import { useTransferStore } from "../stores/useTransfer"
 
-import ScheduledTransferList from './ScheduledTransferList.vue'
+import ScheduledTransferList from "./ScheduledTransferList.vue"
+import ScheduledTransferOptions from "./ScheduledTransferOptions.vue";
 
 const dashboard = useDashboardStore();
 const transferStore = useTransferStore();
+
+// Component Refs
+const scheduledTransferOptionsRef = ref(null)
 
 // Refs for focusing elements
 const addNewBtnRef = ref();
@@ -669,7 +675,8 @@ function toggleModalNewTransfer() {
   transferStore.updateNewTransferOptions(false);
   transferStore.updateSubTransactSummary(false);
   transferStore.updateShowSuccessWindow(false);
-  newSubBilling.value = "Monthly";
+  scheduledTransferOptionsRef.value?.resetOptionsData()
+  /* newSubBilling.value = "Monthly";
   monthConditional.value =
     currentMonth.value !== 11 ? currentMonth.value + 1 : 0;
   durationYear.value = currentYear;
@@ -679,7 +686,7 @@ function toggleModalNewTransfer() {
   checkboxState.value = false;
   reminderChoice.value = "one day";
   descriptionVmodel.value = null;
-  paymentNetworkVModel.value = paymentMethodArr.value[0];
+  paymentNetworkVModel.value = paymentMethodArr.value[0]; */
 
   /* if(addNewTransferModalIsVisible.value) {
     nextTick(() => {
@@ -748,7 +755,7 @@ function backBtnNewTransfer() {
   
 }
 
-const billingMonthlyAriaChecked = ref(true)
+/* const billingMonthlyAriaChecked = ref(true)
 const billingYearlyAriaChecked = ref(false)
 
 function changeBilling(event) {
@@ -903,7 +910,7 @@ function goToSubTransactSummary() {
 function closeWarningModal() {
   warningModalIsVisible.value = false;
   monthlyBtnRef.value.focus();
-}
+} */
 
 //////////////////////////
 // Next Button
@@ -912,67 +919,67 @@ function closeWarningModal() {
 const totalDurationMonths = ref();
 
 function subscriptionNextBtnPreventDefault(e) {
-  if (!editTransferOptions.value) {
+  if (!transferStore.editTransferOptions) {
     e.preventDefault();
     return;
   }
 }
 
 function subscriptionNextBtn() {
-  durationErrorYear.value = false;
-  durationErrorMonth.value = false;
-  durationErrorCurrentYear.value = false;
+  transferStore.updateDurationErrorYear(false)
+  transferStore.updateDurationErrorMonth(false)
+  transferStore.updateDurationErrorCurrentYear(false)
 
   // show error message for invalid year
-  if (durationYear.value < currentYear) {
-    durationErrorYear.value = true;
+  if (transferStore.durationYear < transferStore.currentYear) {
+    transferStore.updateDurationErrorYear(true)
     return;
   }
 
   // show error message for selecting a date that is less than a month
 
-  if(!editTransferModalIsVisible.value) {
-    durationMonth.value = monthArr.value[monthConditional.value];
+  if(!transferStore.editTransferModalIsVisible) {
+    transferStore.updateDurationMonth(transferStore.monthArr[transferStore.monthConditional])
   }
 
   const durationInMilliseconds = Date.parse(
-    `${currentDate.getDate()} ${durationMonth.value} ${durationYear.value}`
+    `${transferStore.currentDate.getDate()} ${transferStore.durationMonth} ${transferStore.durationYear}`
   );
 
   const monthToMillliseconds = 2629800000;
 
   totalDurationMonths.value = Math.round(
-    (durationInMilliseconds - currentDate) / monthToMillliseconds
+    (durationInMilliseconds - transferStore.currentDate) / monthToMillliseconds
   );
 
   if (totalDurationMonths.value < 1) {
-    durationErrorMonth.value = true;
+    transferStore.updateDurationErrorMonth(true)
     return;
   }
 
   // show error when billing cycle is yearly and user chose the current year
-  if (newSubBilling.value === "Yearly" && durationYear.value === currentYear) {
-    durationErrorCurrentYear.value = true;
+  if (transferStore.newSubBilling === "Yearly" && transferStore.durationYear === transferStore.currentYear) {
+    transferStore.updateDurationErrorCurrentYear(true)
     return;
   }
 
   // if billing cycle is per month and client opted to subscribe for a year or more, show a dialog box to inform client that they can choose to pay per year at a discounted price
 
-  if (newSubBilling.value === "Monthly" && totalDurationMonths.value > 11) {
-    warningModalIsVisible.value = true;
+  if (transferStore.newSubBilling === "Monthly" && totalDurationMonths.value > 11) {
+    transferStore.updateWarningModalIsVisible(true)
     return;
   }
 
   // Go to subscription transcription summary (Next page)
-  if (!editTransferModalIsVisible.value) {
-    newTransferOptions.value = false;
+  if (!transferStore.editTransferModalIsVisible) {
+    transferStore.updateNewTransferOptions(false)
   } else {
-    editTransferOptions.value = false;
+    transferStore.updateEditTransferOptions(false)
   }
-  subTransactSummary.value = true;
-  nextTick(() => {
+  transferStore.updateSubTransactSummary(true)
+  /* nextTick(() => {
     backBtnSummaryWindowRef.value.focus()
-  })
+  }) */
 }
 
 /////////////////////
@@ -1214,16 +1221,16 @@ function selectEditTransfer(sub) {
 
 const deleteBtnRef = ref(null);
 
-function openDeleteTransferModal() {
+/* function openDeleteTransferModal() {
   transferStore.openDeleteTransferModal();
-}
+} */
 
-function closeDeleteTransferModal() {
+/* function closeDeleteTransferModal() {
   transferStore.closeDeleteTransferModal();
   deleteBtnRef.value.focus();
-}
+} */
 
-function deleteTransfer() {
+/* function deleteTransfer() {
   // get the company name for the notification and toast
   const companyToBeDeleted =
     tempSelectedSubscription.value.company || transferStore.deleteTransferCompany;
@@ -1265,7 +1272,7 @@ function deleteTransfer() {
   dashboard.updateLastNotificationId(notificationId);
 
   transferStore.closeDeleteTransferModal();
-}
+} */
 
 onMounted(() => {
   carouselRefList.value = []

@@ -9,10 +9,28 @@ export const useTransferStore = defineStore("transfer", {
     selectSubscription,
     newTransferOptions,
     editTransferOptions,
+    addNewTransferModalIsVisible,
     editTransferModalIsVisible,
     subTransactSummary,
     showSuccessWindow,
     tempSelectedSubscription,
+    newSubBilling,
+    durationErrorYear,
+    durationErrorMonth,
+    durationErrorCurrentYear,
+    currentDate,
+    currentMonth,
+    currentYear,
+    monthConditional,
+    durationMonth,
+    durationYear,
+    monthArr,
+    warningModalIsVisible,
+    checkboxState,
+    reminderChoice,
+    descriptionVmodel,
+    paymentMethodArr,
+    paymentNetworkVModel
   }),
   actions: {
     deleteTransferFromNotification(company) {
@@ -26,6 +44,8 @@ export const useTransferStore = defineStore("transfer", {
       this.deleteTransferModalIsVisible = false;
       this.deleteTransferCompany = "";
     },
+
+    // Update state that controls the visibility of the modal content
     updateCurrentSubscription(array) {
       this.currentSubscription = array
     },
@@ -41,15 +61,49 @@ export const useTransferStore = defineStore("transfer", {
     updateEditTransferModalIsVisible(boolean) {
       this.editTransferModalIsVisible = boolean
     },
+    updateAddNewTransferModalIsVisible(boolean) {
+      this.addNewTransferModalIsVisible = boolean
+    },
     updateSubTransactSummary(boolean) {
       this.subTransactSummary = boolean
     },
     updateShowSuccessWindow(boolean) {
       this.showSuccessWindow = boolean
     },
+
+    // Update state used mostly in ScheduledTransferList.vue
     updateTempSelectedSubscription(obj) {
       this.tempSelectedSubscription = obj
-    }
+    },
+
+    // Update state used mostly in ScheduledTransferOptions.vue
+    updateNewSubBilling(string) {
+      this.newSubBilling = string
+    },
+    updateDurationErrorYear(boolean) {
+      this.durationErrorYear = boolean
+    },
+    updateDurationErrorMonth(boolean) {
+      this.durationErrorMonth = boolean
+    },
+    updateDurationErrorCurrentYear(boolean) {
+      this.durationErrorCurrentYear = boolean
+    },
+    updateDurationMonth(monthString) {
+      this.durationMonth = monthString
+    },
+    updateMonthConditional(number) {
+      this.monthConditional = number
+    },
+    updateWarningModalIsVisible(boolean) {
+      this.warningModalIsVisible = boolean
+    },
+    updateCheckboxState(boolean) {
+      this.checkboxState = boolean
+    },
+    updateReminderChoice(string) {
+      this.reminderChoice = string
+    },
   },
 });
 
@@ -173,16 +227,74 @@ const currentSubscription = [
   },
 ];
 
-let selectSubscription = false
+const monthArr = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+]
 
-let newTransferOptions = false
-
-let editTransferOptions = false
-
+// State that control the visibility of the modal itself
+let addNewTransferModalIsVisible = false
 let editTransferModalIsVisible = false
 
+// State that controls the visibility of the modal's content
+let selectSubscription = false
+let newTransferOptions = false
+let editTransferOptions = false
 let subTransactSummary = false
-
 let showSuccessWindow = false
 
+// State that is mostly used in ScheduledTransferList.vue
 let tempSelectedSubscription = null
+
+// State that is mostly used in ScheduledTransferOptions.vue
+let newSubBilling = 'Monthly'
+
+let durationErrorYear = false
+let durationErrorMonth = false
+let durationErrorCurrentYear = false
+const currentDate = new Date();
+const currentMonth = currentDate.getMonth();
+const currentYear = currentDate.getFullYear();
+const monthConditional = currentMonth !== 11 ? currentMonth + 1 : 0
+let durationYear = currentYear
+let durationMonth = monthArr[monthConditional]
+
+let checkboxState = false
+let reminderChoice = ''
+
+let descriptionVmodel = ''
+
+let paymentMethodArr = [
+  {
+    id: "9023897234",
+    paymentNetwork: "Visa",
+    cardNumber: "3232 2323 3232 3232",
+    expireDate: "2/23",
+    cvc: 1234,
+    status: "active",
+    current: true,
+  },
+  {
+    id: "9023953423",
+    paymentNetwork: "MasterCard",
+    cardNumber: "7235 1287 5432 8711",
+    expireDate: "5/26",
+    cvc: 5678,
+    status: "active",
+    current: false,
+  },
+]
+let paymentNetworkVModel = paymentMethodArr[0]
+
+// Warning Modal States
+let warningModalIsVisible = false
