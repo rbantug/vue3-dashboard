@@ -401,7 +401,10 @@
         </div> -->
 
         <!-- Success Window -->
-        <div v-if="showSuccessWindow">
+        <ScheduledTransferSuccess 
+          v-if="transferStore.showSuccessWindow"
+        />
+        <!-- <div v-if="showSuccessWindow">
           <div class="flex justify-center items-center">
             <div class="flex flex-col items-center mt-[30%] relative">
               <div
@@ -414,7 +417,7 @@
               <span class="text-white text-2xl">Success!</span>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Modal Bottom Buttons -->
@@ -622,6 +625,7 @@ import { useTransferStore } from "../stores/useTransfer"
 import ScheduledTransferList from "./ScheduledTransferList.vue"
 import ScheduledTransferOptions from "./ScheduledTransferOptions.vue";
 import ScheduledTransferSummary from "./ScheduledTransferSummary.vue";
+import ScheduledTransferSuccess from "./ScheduledTransferSuccess.vue";
 
 const dashboard = useDashboardStore();
 const transferStore = useTransferStore();
