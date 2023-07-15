@@ -4,7 +4,6 @@ export const useDashboardStore = defineStore('dashboard', {
     state: () => ({
         recentTransactionData,
         pendingNotifyIdDeleteInvoice,
-        clientList,
         msgNotification,
         notifications,
         notifyPingIsVisible,
