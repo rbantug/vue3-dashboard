@@ -8,7 +8,7 @@
               @keydown.enter.exact.stop.prevent="backBtnSummaryWindow"
               @keydown.space.exact.stop.prevent="backBtnSummaryWindow"
               aria-label="go back to transfer details"
-              ref="backBtnSummaryWindowRef"
+              ref="backBtnRef"
             >
               <Icon
                 icon="material-symbols:arrow-back-ios-new-rounded"
@@ -62,12 +62,14 @@
 </template>
 
 <script setup>
-import { nextTick, computed } from 'vue';
+import { nextTick, computed, onMounted, ref } from 'vue';
 import { Icon } from '@iconify/vue';
 import { useTransferStore } from "../stores/useTransfer";
 import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
 
 const transferStore = useTransferStore();
+
+const backBtnRef = ref(null)
 
 function backBtnSummaryWindow() {
   if (!transferStore.editTransferModalIsVisible) {
@@ -76,9 +78,9 @@ function backBtnSummaryWindow() {
     transferStore.updateEditTransferOptions(true);
   }
   transferStore.updateSubTransactSummary(false);
-  /* nextTick(() => {
-    monthlyBtnRef.value.focus()
-  }) */
+  nextTick(() => {
+    transferStore.monthlyBtnRef.focus()
+  })
 }
 
 const outputSummaryDuration = computed(() => {
@@ -118,4 +120,8 @@ const outputSummaryDuration = computed(() => {
     return `${tempYearInteger} year${tempYearInteger > 1 ? "s" : ""}`;
   }
 });
+
+onMounted(() => {
+  transferStore.getBackBtnSummaryWindowRef(backBtnRef.value)
+})
 </script>

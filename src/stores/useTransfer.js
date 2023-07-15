@@ -16,6 +16,8 @@ export const useTransferStore = defineStore("transfer", {
     processNewSubscription,
     tempSelectedSubscription,
     newSubBilling,
+    billingMonthlyAriaChecked,
+    billingYearlyAriaChecked,
     durationErrorYear,
     durationErrorMonth,
     durationErrorCurrentYear,
@@ -27,12 +29,22 @@ export const useTransferStore = defineStore("transfer", {
     durationYear,
     monthArr,
     totalDurationMonths,
+    startMonthAndYear,
+    durationMonthEditTransfer,
+    durationYearNotVModel,
     warningModalIsVisible,
     checkboxState,
     reminderChoice,
+    reminderIndex,
+    reminderOptions,
     descriptionVmodel,
     paymentMethodArr,
-    paymentNetworkVModel
+    paymentNetworkVModel,
+    backBtnTransferOptionsRef,
+    backBtnSummaryWindowRef,
+    subscriptionListRef,
+    deleteBtnRef,
+    monthlyBtnRef,
   }),
   actions: {
     deleteTransferFromNotification(company) {
@@ -49,91 +61,137 @@ export const useTransferStore = defineStore("transfer", {
 
     // Update state that controls the visibility of the modal content
     updateCurrentSubscription(array) {
-      this.currentSubscription = array
+      this.currentSubscription = array;
     },
     updateSelectSubscription(boolean) {
-      this.selectSubscription = boolean
+      this.selectSubscription = boolean;
     },
     updateNewTransferOptions(boolean) {
-      this.newTransferOptions = boolean
+      this.newTransferOptions = boolean;
     },
     updateEditTransferOptions(boolean) {
-      this.editTransferOptions = boolean
+      this.editTransferOptions = boolean;
     },
     updateEditTransferModalIsVisible(boolean) {
-      this.editTransferModalIsVisible = boolean
+      this.editTransferModalIsVisible = boolean;
     },
     updateAddNewTransferModalIsVisible(boolean) {
-      this.addNewTransferModalIsVisible = boolean
+      this.addNewTransferModalIsVisible = boolean;
     },
     updateSubTransactSummary(boolean) {
-      this.subTransactSummary = boolean
+      this.subTransactSummary = boolean;
     },
     updateShowSuccessWindow(boolean) {
-      this.showSuccessWindow = boolean
+      this.showSuccessWindow = boolean;
     },
 
     // Update the state used at the button found at the bottom of the modal
     updateProcessNewSubscription(boolean) {
-      this.processNewSubscription = boolean
+      this.processNewSubscription = boolean;
     },
 
     // Update state used mostly in ScheduledTransferList.vue
     updateTempSelectedSubscription(obj) {
-      this.tempSelectedSubscription = obj
+      this.tempSelectedSubscription = obj;
     },
 
     // Update state used mostly in ScheduledTransferOptions.vue
-    updateNewSubBilling(string) {
-      this.newSubBilling = string
+    updateNSBilling(string) {
+      this.newSubBilling = string;
+    },
+    updateBillingMonthlyAriaChecked(boolean) {
+      this.billingMonthlyAriaChecked = boolean;
+    },
+    updateBillingYearlyAriaChecked(boolean) {
+      this.billingYearlyAriaChecked = boolean;
     },
     updateDurationErrorYear(boolean) {
-      this.durationErrorYear = boolean
+      this.durationErrorYear = boolean;
     },
     updateDurationErrorMonth(boolean) {
-      this.durationErrorMonth = boolean
+      this.durationErrorMonth = boolean;
     },
     updateDurationErrorCurrentYear(boolean) {
-      this.durationErrorCurrentYear = boolean
+      this.durationErrorCurrentYear = boolean;
     },
     updateDurationMonth(monthString) {
-      this.durationMonth = monthString
+      this.durationMonth = monthString;
     },
     updateDurationYear(number) {
-      this.durationYear = number
+      this.durationYear = number;
     },
     updateMonthConditional(number) {
-      this.monthConditional = number
+      this.monthConditional = number;
+    },
+    updateCurrentMonth(number) {
+      this.currentMonth = number;
     },
     updateTotalDurationMonths(number) {
-      this.totalDurationMonths = number
+      this.totalDurationMonths = number;
+    },
+    updateStartMonthAndYear(monthString, year) {
+      this.startMonthAndYear.month = monthString;
+      this.startMonthAndYear.year = year;
+    },
+    updateDurationMonthEditTransfer(number) {
+      this.durationMonthEditTransfer = number
+    },
+    updateDurationYearNotVModel(number) {
+      this.durationYearNotVModel = number
     },
     updateWarningModalIsVisible(boolean) {
-      this.warningModalIsVisible = boolean
+      this.warningModalIsVisible = boolean;
     },
     updateCheckboxState(boolean) {
-      this.checkboxState = boolean
+      this.checkboxState = boolean;
     },
     updateReminderChoice(string) {
-      this.reminderChoice = string
+      this.reminderChoice = string;
+    },
+    updateReminderIndex(number) {
+      this.reminderIndex = number;
     },
     updateDescriptionVmodel(string) {
-      this.descriptionVmodel = string
+      this.descriptionVmodel = string;
     },
     updatePaymentNetworkVModel(val) {
-      this.paymentNetworkVModel = val
+      this.paymentNetworkVModel = val;
     },
+    getBackBtnTransferOptionsRef(el) {
+      this.backBtnTransferOptionsRef = el
+    },
+    getBackBtnSummaryWindowRef(el) {
+      this.backBtnSummaryWindowRef = el
+    },
+    getSubscriptionListRef(arr) {
+      this.subscriptionListRef = arr
+    },
+    getDeleteBtnRef(el) {
+      this.deleteBtnRef = el
+    },
+    getMonthlyBtnRef(el) {
+      this.monthlyBtnRef = el
+    }
   },
   getters: {
     outputBillingText(state) {
-      return state.newSubBilling === "Monthly" ? "month" : "year"
+      return state.newSubBilling === "Monthly" ? "month" : "year";
     },
     outputPrice(state) {
-      if (state.newSubBilling === "Monthly") return state.tempSelectedSubscription.amountMonth;
+      if (state.newSubBilling === "Monthly")
+        return state.tempSelectedSubscription?.amountMonth;
 
-      if (state.newSubBilling === "Yearly") return state.tempSelectedSubscription.amountYear;
+      if (state.newSubBilling === "Yearly")
+        return state.tempSelectedSubscription?.amountYear;
+    },
+    outputFirstTransfer(state) {
+      // prevent this code from running when editing an existing transfer
+      if(state.editTransferModalIsVisible) return
+
+      const transferArr = state.subscriptionListRef?.find(transfer => transfer !== undefined)
+      return transferArr?.children[0]
     }
-  }
+  },
 });
 
 let deleteTransferModalIsVisible = false;
@@ -223,12 +281,14 @@ const allCompanies = [
   },
 ];
 
+const monthToMillliseconds = 2629800000;
+
 const currentSubscription = [
   {
     company: "Youtube",
-    subStartDate: 1616256000000,
+    subStartDate: Date.now(),
     billing: "Monthly",
-    subEndDate: 1688918400000,
+    subEndDate:  Date.now() + (monthToMillliseconds * 3),
     reminderIsActive: false,
     reminderMsg: "none",
     description: null,
@@ -236,9 +296,9 @@ const currentSubscription = [
   },
   {
     company: "Netflix",
-    subStartDate: 1623686400000,
+    subStartDate: Date.now(),
     billing: "Yearly",
-    subEndDate: 1686758400000,
+    subEndDate: Date.now() + (monthToMillliseconds * 24),
     reminderIsActive: true,
     reminderMsg: "one month",
     description: "Mindlessly consuming content is my purpose in life",
@@ -246,9 +306,9 @@ const currentSubscription = [
   },
   {
     company: "Spotify",
-    subStartDate: 1632153600000,
+    subStartDate: Date.now(),
     billing: "Monthly",
-    subEndDate: 1668960000000,
+    subEndDate: Date.now() + (monthToMillliseconds * 16),
     reminderIsActive: true,
     reminderMsg: "one day",
     description: "It is better to pay for a subscription than to own things.",
@@ -269,43 +329,50 @@ const monthArr = [
   "October",
   "November",
   "December",
-]
+];
 
 // State that control the visibility of the modal itself
-let addNewTransferModalIsVisible = false
-let editTransferModalIsVisible = false
+let addNewTransferModalIsVisible = false;
+let editTransferModalIsVisible = false;
 
 // State that controls the visibility of the modal's content
-let selectSubscription = false
-let newTransferOptions = false
-let editTransferOptions = false
-let subTransactSummary = false
-let showSuccessWindow = false
+let selectSubscription = false;
+let newTransferOptions = false;
+let editTransferOptions = false;
+let subTransactSummary = false;
+let showSuccessWindow = false;
 
 // State that controls the visibility of the buttons found at the bottom of the modal
-let processNewSubscription = false
+let processNewSubscription = false;
 
 // State that is mostly used in ScheduledTransferList.vue
-let tempSelectedSubscription = null
+let tempSelectedSubscription = null;
 
 // State that is mostly used in ScheduledTransferOptions.vue
-let newSubBilling = 'Monthly'
+let newSubBilling = "Monthly";
+let billingMonthlyAriaChecked = true;
+let billingYearlyAriaChecked = false;
 
-let durationErrorYear = false
-let durationErrorMonth = false
-let durationErrorCurrentYear = false
+let durationErrorYear = false;
+let durationErrorMonth = false;
+let durationErrorCurrentYear = false;
 const currentDate = new Date();
-const currentMonth = currentDate.getMonth();
+let currentMonth = currentDate.getMonth();
 const currentYear = currentDate.getFullYear();
-const monthConditional = currentMonth !== 11 ? currentMonth + 1 : 0
-let durationYear = currentYear
-let durationMonth = monthArr[monthConditional]
-let totalDurationMonths = 0
+const monthConditional = currentMonth !== 11 ? currentMonth + 1 : 0;
+let durationYear = currentYear;
+let durationMonth = monthArr[monthConditional];
+let totalDurationMonths = 0;
+let startMonthAndYear = { month: null, year: 0 };
+let durationMonthEditTransfer = 0
+let durationYearNotVModel = 0
 
-let checkboxState = false
-let reminderChoice = ''
+let checkboxState = false;
+let reminderChoice = "";
+let reminderIndex = 0;
+const reminderOptions = ["one day", "one week", "one month"];
 
-let descriptionVmodel = ''
+let descriptionVmodel = "";
 
 let paymentMethodArr = [
   {
@@ -326,8 +393,16 @@ let paymentMethodArr = [
     status: "active",
     current: false,
   },
-]
-let paymentNetworkVModel = paymentMethodArr[0]
+];
+let paymentNetworkVModel = paymentMethodArr[0];
 
 // Warning Modal States
-let warningModalIsVisible = false
+let warningModalIsVisible = false;
+
+// refs on HTML elements to be used for focusing when using keyboard for navigation
+
+const backBtnTransferOptionsRef = null
+const backBtnSummaryWindowRef = null
+const subscriptionListRef = null
+const deleteBtnRef = null
+const monthlyBtnRef = null

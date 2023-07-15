@@ -27,10 +27,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, nextTick, onMounted } from 'vue'
 import { useTransferStore } from '../stores/useTransfer';
 
 const transferStore = useTransferStore();
+
+const subscriptionListRef = ref([])
 
 const isActiveSubscription = computed(() =>
 transferStore.currentSubscription.map((sub) => sub.company)
@@ -43,9 +45,12 @@ function goToTransferOptions(event) {
     (company) => company.company === event.target.dataset.company
   );
   transferStore.updateTempSelectedSubscription(temp) 
-  /* nextTick(() => {
-    backBtnTransferOptionsRef.value.focus()
-  }) */
-  
+  nextTick(() => {
+    transferStore.backBtnTransferOptionsRef.focus()
+  })
 }
+
+onMounted(() => {
+  transferStore.getSubscriptionListRef(subscriptionListRef.value)
+})
 </script>

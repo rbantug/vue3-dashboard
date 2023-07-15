@@ -8,6 +8,7 @@
         @keydown.enter.exact.stop.prevent="backBtnNewTransfer"
         @keydown.space.exact.stop.prevent="backBtnNewTransfer"
         aria-label="go back to the list of subscriptions"
+        ref="backBtnRef"
       >
         <Icon
           icon="material-symbols:arrow-back-ios-new-rounded"
@@ -32,12 +33,12 @@
         >
         <template v-if="transferStore.editTransferModalIsVisible">
         <span
-          >Start date: {{ startMonthAndYear.month }}
-          {{ startMonthAndYear.year }}</span
+          >Start date: {{ transferStore.startMonthAndYear.month }}
+          {{ transferStore.startMonthAndYear.year }}</span
         >
-        <span v-if="editTransferModalIsVisible"
-          >End date: {{ monthArr[durationMonthEditTransfer] }}
-          {{ durationYearNotVModel }}</span>
+        <span v-if="transferStore.editTransferModalIsVisible"
+          >End date: {{ transferStore.monthArr[transferStore.durationMonthEditTransfer] }}
+          {{ transferStore.durationYearNotVModel }}</span>
         </template>
       </h1>
       <div class="flex w-[90%]">
@@ -56,7 +57,7 @@
                 @keydown.enter.exact.stop.prevent="changeBilling"
                 @keydown.space.exact.stop.prevent="changeBilling"
                 ref="monthlyBtnRef"
-                :aria-checked="billingMonthlyAriaChecked"
+                :aria-checked="transferStore.billingMonthlyAriaChecked"
                 aria-label="Billing Cycle Monthly"
                 role="switch"
               >
@@ -69,7 +70,7 @@
                 @keydown.enter.exact.stop.prevent="changeBilling"
                 @keydown.space.exact.stop.prevent="changeBilling"
                 ref="yearlyBtnRef"
-                :aria-checked="billingYearlyAriaChecked"
+                :aria-checked="transferStore.billingYearlyAriaChecked"
                 aria-label="Billing Cycle Yearly"
                 role="switch"
               >
@@ -95,7 +96,7 @@
                   :data-prop="transferStore.monthArr"
                   :current-month="
                     transferStore.editTransferModalIsVisible
-                    ? durationMonthEditTransfer
+                    ? transferStore.durationMonthEditTransfer
                       : transferStore.monthConditional
                   "
                   @emit-data="updateDurationMonth"
@@ -152,8 +153,8 @@
             <HeadlessUIListBox
               v-if="transferStore.checkboxState"
               aria-label-prop="reminder options"
-              :data-prop="reminderOptions"
-              :reminder-index="reminderIndex"
+              :data-prop="transferStore.reminderOptions"
+              :reminder-index="transferStore.reminderIndex"
               width-prop="w-[8rem]"
               @emit-data="updateReminderChoice"
             />
@@ -308,59 +309,58 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { Icon } from "@iconify/vue";
 import { toast } from "vue3-toastify";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
+import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
 import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 import { useTransferStore } from "../stores/useTransfer";
-import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
 
 const transferStore = useTransferStore();
+
+const backBtnRef = ref(null)
 
 const emits = defineEmits(['emitCreateCarouselSubscription'])
 
 function resetOptionsData() {
     transferStore.updateNewSubBilling = 'Monthly'
-  transferStore.updateMonthConditional(currentMonth.value !== 11 ? currentMonth.value + 1 : 0)
-  transferStore.updateDurationYear(currentYear)
+  transferStore.updateMonthConditional(transferStore.currentMonth !== 11 ? transferStore.updateCurrentMonth(transferStore.currentMonth + 1) : 0)
+  transferStore.updateDurationYear(transferStore.currentYear)
   transferStore.updateDurationErrorMonth(false)
   transferStore.updateDurationErrorYear(false)
   transferStore.updateDurationErrorCurrentYear(false)
   transferStore.updateCheckboxState(false)
   transferStore.updateReminderChoice("one day")
   transferStore.updateDescriptionVmodel(null)
-  transferStore.updatePaymentNetworkVModel(paymentMethodArr.value[0]);
+  transferStore.updatePaymentNetworkVModel(transferStore.paymentMethodArr[0]);
 }
 
 function backBtnNewTransfer() {
   transferStore.updateNewTransferOptions(false);
   transferStore.updateSelectSubscription(true);
 
-  /* nextTick(() => {
-    getFirstTransfer().children[0].focus()
-  }) */
+  nextTick(() => {
+    transferStore.outputFirstTransfer.focus()
+  })
 }
 
 const monthlyBtnRef = ref(null)
 
-const billingMonthlyAriaChecked = ref(true);
-const billingYearlyAriaChecked = ref(false);
-
 function changeBilling(event) {
-    transferStore.updateNewSubBilling(event.target.textContent.trim());
+    transferStore.updateNSBilling(event.target.textContent.trim());
 
   if (event.target.textContent.trim() === "Monthly") {
-    billingMonthlyAriaChecked.value = true;
-    billingYearlyAriaChecked.value = false;
-    durationErrorYear.value = false;
+    transferStore.updateBillingMonthlyAriaChecked(true)
+    transferStore.updateBillingYearlyAriaChecked(false)
+    transferStore.updateDurationErrorYear(false)
   }
 
   if (event.target.textContent.trim() === "Yearly") {
-    billingMonthlyAriaChecked.value = false;
-    billingYearlyAriaChecked.value = true;
-    durationErrorMonth.value = false;
+    transferStore.updateBillingMonthlyAriaChecked(false)
+    transferStore.updateBillingYearlyAriaChecked(true)
+    transferStore.updateDurationErrorMonth(false)
   }
 }
 
@@ -371,35 +371,6 @@ const billingIsYearly = computed(() => transferStore.newSubBilling === "Yearly")
 ///////////////
 // Duration
 ///////////////
-
-/* const currentDate = new Date();
-const currentMonth = ref(currentDate.getMonth());
-const currentYear = currentDate.getFullYear();
-
-const monthArr = ref([
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-]);
-
-const monthConditional = ref(
-  currentMonth.value !== 11 ? currentMonth.value + 1 : 0
-); // show the next month
-
-const durationYear = ref(currentYear);
-const durationMonth = ref(monthArr.value[monthConditional.value]);
-const durationErrorYear = ref(false);
-const durationErrorMonth = ref(false);
-const durationErrorCurrentYear = ref(false); */
 
 function updateDurationMonth(data) {
   transferStore.updateDurationMonth(data);
@@ -413,47 +384,13 @@ function updateDurationMonth(data) {
 // Reminder
 //////////////////
 
-const checkboxState = ref(false);
-const reminderChoice = ref();
-
 function updateReminderChoice(data) {
   transferStore.updateReminderChoice(data)
 }
 
-const reminderOptions = ref(["one day", "one week", "one month"]);
-
-////////////////////
-// Description
-////////////////////
-
-const descriptionVmodel = ref();
-
 ///////////////////
 // Payment Method
 ///////////////////
-
-/* const paymentMethodArr = ref([
-  {
-    id: "9023897234",
-    paymentNetwork: "Visa",
-    cardNumber: "3232 2323 3232 3232",
-    expireDate: "2/23",
-    cvc: 1234,
-    status: "active",
-    current: true,
-  },
-  {
-    id: "9023953423",
-    paymentNetwork: "MasterCard",
-    cardNumber: "7235 1287 5432 8711",
-    expireDate: "5/26",
-    cvc: 5678,
-    status: "active",
-    current: false,
-  },
-]);
-
-const paymentNetworkVModel = ref(paymentMethodArr.value[0]); */
 
 function ariaLabelPaymentMethod(card) {
   return `Payment method. ${
@@ -466,15 +403,9 @@ function ariaLabelPaymentMethod(card) {
   }`;
 }
 
-/* function outputLast4CardNum(srcData) {
-  return srcData.cardNumber.slice(15, srcData.cardNumber.length);
-} */
-
 //////////////////////////
 // Warning Dialog Box
 //////////////////////////
-
-//const warningModalIsVisible = ref(false);
 
 function goToSubTransactSummary() {
   if (!transferStore.editTransferModalIsVisible) {
@@ -493,7 +424,7 @@ function closeWarningModal() {
 
 function closeDeleteTransferModal() {
   transferStore.closeDeleteTransferModal();
-  //deleteBtnRef.value.focus();
+  transferStore.deleteBtnRef.focus()
 }
 
 function deleteTransfer() {
@@ -540,5 +471,10 @@ function deleteTransfer() {
   transferStore.closeDeleteTransferModal();
 }
 
-defineExpose({ resetOptionsData })
+defineExpose({ resetOptionsData, monthlyBtnRef })
+
+onMounted(() => {
+  transferStore.getBackBtnTransferOptionsRef(backBtnRef.value)
+  transferStore.getMonthlyBtnRef(monthlyBtnRef.value)
+})
 </script>
