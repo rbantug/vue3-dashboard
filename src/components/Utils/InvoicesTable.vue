@@ -123,11 +123,13 @@ export default {
 import { Icon } from '@iconify/vue';
 import { ref, computed, toRef } from 'vue'
 import BaseWarningModal from '../Base Components/BaseWarningModal.vue';
-import { useDashboardStore } from '../../stores/useDashboard';
 import { getRandomNumber } from '../../composables-and-reusable-logic/getRandomNumber';
 import { toast } from "vue3-toastify";
+import { useDashboardStore } from '../../stores/useDashboard';
+import { useInvoicesStore } from '../../stores/useInvoice';
 
 const dashboard = useDashboardStore();
+const invoicesStore = useInvoicesStore();
 
 const props = defineProps({
   recentInvoice: {
@@ -167,7 +169,7 @@ const reactiveStatusProgObj = toRef(props, 'statusProgressObj')
 
 const emits = defineEmits(['cancelPendingInvoice', 'deleteSuccessfulInvoice', 'focusModalCloseBtn'])
 
-let invoiceArr = ref([...dashboard.invoiceData])
+let invoiceArr = ref([...invoicesStore.invoiceData])
 
 const arr = computed(() => {
   updateInvoiceArr()
@@ -179,7 +181,7 @@ const arr = computed(() => {
 })
 
 function updateInvoiceArr() {
-  invoiceArr.value = [...dashboard.invoiceData]
+  invoiceArr.value = [...invoicesStore.invoiceData]
 }
 
 function deleteInvoice(invoice) {
@@ -214,8 +216,8 @@ function deleteInvoice(invoice) {
 
   if(invoice.status === 'Pending') {
     dashboard.deleteSingleInvoice(invoice.id)
-    clearInterval(dashboard.outputPendingBar[`${invoice.id}SI`])
-    clearTimeout(dashboard.outputPendingBar[`${invoice.id}ST`])
+    clearInterval(invoicesStore.outputPendingBar[`${invoice.id}SI`])
+    clearTimeout(invoicesStore.outputPendingBar[`${invoice.id}ST`])
     emits('cancelPendingInvoice')
   } 
   if(invoice.status === 'Successful') {

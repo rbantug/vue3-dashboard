@@ -9,6 +9,9 @@ export const useInvoicesStore = defineStore("invoice", {
     deleteInvoiceModalIsVisible,
     lastInvoiceId,
     clientList,
+    outputPendingBar,
+    hasPending,
+    hasSuccess,
   }),
   actions: {
     updateAddInvoiceModalIsVisible(boolean) {
@@ -29,6 +32,9 @@ export const useInvoicesStore = defineStore("invoice", {
     updateLastInvoiceId() {
       this.lastInvoiceId = this.invoiceData[0].id;
     },
+    updateLastInvoiceIdFormSubmit(number) {
+        this.lastInvoiceId = number
+    },
     deleteSingleInvoice(id) {
       const index = this.invoiceData.findIndex((invoice) => invoice.id === id);
 
@@ -41,6 +47,26 @@ export const useInvoicesStore = defineStore("invoice", {
     },
     updateDelInvModalVisibility(val) {
       this.deleteInvoiceModalIsVisible = val;
+    },
+    updateHasPending(boolean) {
+      this.hasPending = boolean
+    },
+    updateHasSuccess(boolean) {
+      this.hasSuccess = boolean
+    },
+
+    // outputPendingBar related actions
+    updateEntireOPB(OPB) {
+      this.outputPendingBar = OPB;
+    },
+    updateOPBAddNewProp(propId) {
+        this.outputPendingBar.addNewProp(propId)
+    },
+    updateOPBPropValue(propName, val) {
+        this.outputPendingBar[propName] = val
+    },
+    OPBRemoveProp(propId) {
+        this.outputPendingBar.removeProp(propId)
     },
   },
   getters: {
@@ -108,10 +134,33 @@ const clientList = [
 // State that controls modal visibility
 const addInvoiceModalIsVisible = false;
 const stateInvoicesViewAll = false;
-
-let invoiceDataToBeRemoved = null;
-
 let deleteInvoiceModalIsVisible = false;
 
+// element ref for focusing when using keyboard navigation
+
+let invoiceDataToBeRemoved = null;
 let lastInvoiceId = 0;
+
+// State that controls messages that shows up when there are no invoices
+
+const hasPending = null;
+const hasSuccess = null;
+
+// Misc
+
+const outputPendingBar = {
+    addNewProp(name) {
+      this[name] = 0;
+      this[`${name}SI`] = null;
+      this[`${name}ST`] = null;
+      this[`${name}invoiceId`] = name;
+      this[`${name}notificationId`] = null;
+    },
+    removeProp(name) {
+      delete this[name];
+      delete this[`${name}SI`];
+      delete this[`${name}ST`];
+      delete this[`${name}invoiceId`];
+    },
+  };
 

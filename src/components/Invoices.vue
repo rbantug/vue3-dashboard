@@ -6,7 +6,7 @@
     ariaLabelProp="all invoices"
     @close="closeModal"
     ref="modalRef"
-    :close-btn-keyboard-trap="dashboard.invoiceData.length === 0"
+    :close-btn-keyboard-trap="invoicesStore.invoiceData.length === 0"
   >
     <template #header>All Invoices</template>
     <template #default>
@@ -77,7 +77,11 @@
 
   <!-- Modal for New Invoice Btn -->
 
-  <BaseModal
+  <InvoicesAddNew 
+    :new-invoice-btn-ref="newInvoiceBtnRef"
+    @run-check-pendings="checkPendings"
+  />
+  <!-- <BaseModal
     :show="addInvoiceModalIsVisible"
     ariaLabelProp="add new invoice."
     dialogCustomHeight="h-[28rem]"
@@ -183,7 +187,7 @@
         </div>
       </div>
     </template>
-  </BaseModal>
+  </BaseModal> -->
 
   <!-- Main -->
 
@@ -197,7 +201,7 @@
         <div class="flex gap-x-4">
           <button
             class="flex p-2 text-sm bg-gray-700 text-gray-300 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
-            ref="refViewAllBtn"
+            ref="viewAllBtnRef"
             aria-label="view all invoices."
             @click="openModal"
           >View All
@@ -205,7 +209,7 @@
           <button
             class="flex items-center gap-x-1 p-2 bg-gray-700 text-gray-300 rounded-lg outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white focus-visible:text-white duration-300"
             aria-label="add new invoice."
-            ref="refNewInvoiceBtn"
+            ref="newInvoiceBtnRef"
             @click="openModal"
           >
             <Icon icon="ic:baseline-plus" class="h-4 w-4" />
@@ -221,10 +225,10 @@
           There are no invoices
         </div>
         <InvoicesTable
-          ref="refInvoiceTable"
+          ref="invoiceTableRef"
           recent-invoice
           status="all"
-          :status-progress-obj="outputPendingBar"
+          :status-progress-obj="invoicesStore.outputPendingBar"
           :invoice-list="invoiceArr"
         />
       </div>
@@ -234,7 +238,6 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useDashboardStore } from "../stores/useDashboard";
 import { Icon } from "@iconify/vue";
 import BaseModal from "./Base Components/BaseModal.vue";
 import BaseCombobox from "./Base Components/BaseCombobox.vue";
@@ -242,15 +245,24 @@ import InvoicesTable from "./Utils/InvoicesTable.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
+import { useDashboardStore } from "../stores/useDashboard";
+import { useInvoicesStore } from "../stores/useInvoice"
+
+import InvoicesAddNew from "./InvoicesAddNew.vue";
 
 const dashboard = useDashboardStore();
+const invoicesStore = useInvoicesStore()
 
-let invoiceArr = ref([...dashboard.invoiceData]);
+let invoiceArr = ref([...invoicesStore.invoiceData]);
 
 const addInvoiceModalIsVisible = ref(false);
-const refViewAllBtn = ref(null);
-const refNewInvoiceBtn = ref(null);
-const refInvoiceTable = ref(null);
+
+// focus btn ref
+const viewAllBtnRef = ref(null);
+const newInvoiceBtnRef = ref(null);
+
+// component ref
+const invoiceTableRef = ref(null);
 
 // conditional styling for pending invoices
 const hasPending = ref(null);
@@ -258,25 +270,27 @@ const hasPending = ref(null);
 // conditional styling for successful invoices
 const hasSuccess = ref(null);
 
-// v-model and form submission method
+/* // v-model and form submission method
 const dateFormData = ref("");
 const amountFormData = ref(0);
 
 // state for error messages when adding new invoices for date and amount
 const showDateErrorMsg = ref(false);
-const showAmountErrorMsg = ref(false);
+const showAmountErrorMsg = ref(false); */
 
 ////////////////////////////////
 // Headless UI Combobox
 ////////////////////////////////
 
-const comboboxStyling = ref(
+/* const comboboxStyling = ref(
   "bg-white text-left shadow-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2"
-);
+); */
 
-const inputBoxStyling = ref("py-2 pl-3 pr-10 leading-5 text-gray-900");
+const comboboxStyling = "bg-white text-left shadow-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2";
 
-const buttonStyling = ref('px-2 focus:bg-gray-400/20"');
+const inputBoxStyling = "py-2 pl-3 pr-10 leading-5 text-gray-900";
+
+const buttonStyling = 'px-2 focus:bg-gray-400/20"';
 
 let selected = ref();
 
@@ -284,7 +298,7 @@ function updateSelectedOption(val) {
   selected.value = val
 }
 
-const comboboxRef = ref()
+/* const comboboxRef = ref()
 
 let newId;
 
@@ -382,17 +396,17 @@ function formSubmit() {
   addNotifyInvoice();
   dateFormData.value = "";
   amountFormData.value = 0;
-}
+} */
 
 function openModal(event) {
   if (event.target.textContent.trim() === "View All") {
-    dashboard.showInvoicesViewAll()
+    invoicesStore.showInvoicesViewAll()
   }
   if (event.target.textContent.trim() === "New Invoice")
-    addInvoiceModalIsVisible.value = true;
+    invoicesStore.updateAddInvoiceModalIsVisible(true)
 }
 
-function closeModal(emitData) {
+/* function closeModal(emitData) {
   dashboard.closeInvoicesViewAll();
   addInvoiceModalIsVisible.value = false;
   showDateErrorMsg.value = false;
@@ -407,13 +421,13 @@ function closeModal(emitData) {
   if (emitData === "all invoices") {
     refViewAllBtn.value.focus();
   }
-}
+} */
 
 /////////////////////////////
 // Pending Invoices status progress bar
 /////////////////////////////
 
-const outputPendingBar = ref({
+/* const outputPendingBar = ref({
   addNewProp(name) {
     this[name] = 0;
     this[`${name}SI`] = null;
@@ -427,20 +441,24 @@ const outputPendingBar = ref({
     delete this[`${name}ST`];
     delete this[`${name}invoiceId`];
   },
-});
+}); */
 
-function runPendingInvoiceBar(propId, notificationId) {
-  outputPendingBar.value.addNewProp(propId);
+/* function runPendingInvoiceBar(propId, notificationId) {
+  //outputPendingBar.value.addNewProp(propId);
+  invoicesStore.updateOPBAddNewProp(propId)
   let tempTime = 10000;
 
-  outputPendingBar.value[`${propId}notificationId`] = notificationId;
+  //outputPendingBar.value[`${propId}notificationId`] = notificationId;
+  invoicesStore.updateOPBPropValue(`${propId}notificationId`, notificationId)
 
-  outputPendingBar.value[`${propId}SI`] = setInterval(() => {
+  //outputPendingBar.value[`${propId}SI`] =
+  invoicesStore.updateOPBPropValue(`${propId}SI`, setInterval(() => {
     tempTime = getRandomNumber(5000, 10000);
-    outputPendingBar.value[propId] += 25;
-    if (outputPendingBar.value[propId] >= 100) {
-      clearInterval(outputPendingBar.value[`${propId}SI`]);
-      outputPendingBar.value[`${propId}ST`] = setTimeout(() => {
+    //outputPendingBar.value[propId] += 25;
+    invoicesStore.updateOPBPropValue(propId, invoicesStore.outputPendingBar[propId] + 25)
+    if (invoicesStore.outputPendingBar[propId] >= 100) {
+      clearInterval(invoicesStore.outputPendingBar[`${propId}SI`]);
+      invoicesStore.updateOPBPropValue(`${propId}ST`, setTimeout(() => {
         const getIndex = invoiceArr.value.findIndex((el) => el.id == propId);
         invoiceArr.value[getIndex].status = "Successful";
         hasSuccess.value = true
@@ -453,7 +471,7 @@ function runPendingInvoiceBar(propId, notificationId) {
 
         toast.success(
           `Invoice #${
-            outputPendingBar.value[`${propId}invoiceId`]
+            invoicesStore.outputPendingBar[`${propId}invoiceId`]
           } was successfully processed`,
           {
             autoClose: 3000,
@@ -481,7 +499,7 @@ function runPendingInvoiceBar(propId, notificationId) {
           type: "invoice",
           status: "successful",
           message: `Invoice #${
-            outputPendingBar.value[`${propId}invoiceId`]
+            invoicesStore.outputPendingBar[`${propId}invoiceId`]
           } was successfully processed`,
           showCancelBtn: false,
           invoiceId: newId,
@@ -490,42 +508,42 @@ function runPendingInvoiceBar(propId, notificationId) {
 
         // remove pending notification after showing the successful notification
         dashboard.removeNotification(
-          outputPendingBar.value[`${propId}notificationId`]
+          invoicesStore.outputPendingBar[`${propId}notificationId`]
         );
 
-        outputPendingBar.value.removeProp(propId);
-      }, 1000);
+        invoicesStore.OPBRemoveProp(propId)
+      }, 1000))
     }
-  }, tempTime);
+  }, tempTime))
 
-  dashboard.updateOutputPendingBar(outputPendingBar.value);
-}
+  //dashboard.updateOutputPendingBar(outputPendingBar.value);
+} */
 
 function checkPendings() {
-  const currentInvoiceData = dashboard.invoiceData;
+  const currentInvoiceData = invoicesStore.invoiceData;
   const index = currentInvoiceData.findIndex(
     (invoice) => invoice.status === "Pending"
   );
 
   if (index === -1) {
-    hasPending.value = false;
+    invoicesStore.updateHasPending(false)
   }
 
-  invoiceArr.value = [...dashboard.invoiceData];
+  invoiceArr.value = [...invoicesStore.invoiceData];
 }
 function checkSuccess() {
-  const currentInvoiceData = dashboard.invoiceData;
+  const currentInvoiceData = invoicesStore.invoiceData;
   const index = currentInvoiceData.findIndex(
     (invoice) => invoice.status === "Successful"
   );
 
   if (index !== -1) {
-    hasSuccess.value = true;
+    invoicesStore.updateHasSuccess(true);
   } else {
-    hasSuccess.value = false;
+    invoicesStore.updateHasSuccess(false);
   }
 
-  invoiceArr.value = [...dashboard.invoiceData];
+  invoiceArr.value = [...invoicesStore.invoiceData];
 }
 
 // BaseModal related code
@@ -539,7 +557,7 @@ function focusModalCloseBtn() {
 onMounted(() => {
   checkPendings();
   checkSuccess();
-  dashboard.updateLastInvoiceId();
+  invoicesStore.updateLastInvoiceId();
 });
 </script>
 
