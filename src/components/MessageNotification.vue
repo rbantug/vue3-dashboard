@@ -53,7 +53,7 @@
               <h3 class="mt-2 mb-1 text-sm">
                 {{ msg.title }}
               </h3>
-              <div class="text-sm text-gray-300">{{ msg.message }}
+              <div class="w-[12rem] text-sm text-gray-300">{{ msg.message }}
               </div>
               <div
                   class="absolute right-0 top-2 flex justify-center items-center h-6 w-6 cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
