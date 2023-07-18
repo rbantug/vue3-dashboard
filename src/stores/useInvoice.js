@@ -33,7 +33,7 @@ export const useInvoicesStore = defineStore("invoice", {
       this.lastInvoiceId = this.invoiceData[0].id;
     },
     updateLastInvoiceIdFormSubmit(number) {
-        this.lastInvoiceId = number
+      this.lastInvoiceId = number;
     },
     deleteSingleInvoice(id) {
       const index = this.invoiceData.findIndex((invoice) => invoice.id === id);
@@ -49,10 +49,10 @@ export const useInvoicesStore = defineStore("invoice", {
       this.deleteInvoiceModalIsVisible = val;
     },
     updateHasPending(boolean) {
-      this.hasPending = boolean
+      this.hasPending = boolean;
     },
     updateHasSuccess(boolean) {
-      this.hasSuccess = boolean
+      this.hasSuccess = boolean;
     },
 
     // outputPendingBar related actions
@@ -60,20 +60,46 @@ export const useInvoicesStore = defineStore("invoice", {
       this.outputPendingBar = OPB;
     },
     updateOPBAddNewProp(propId) {
-        this.outputPendingBar.addNewProp(propId)
+      this.outputPendingBar.addNewProp(propId);
     },
     updateOPBPropValue(propName, val) {
-        this.outputPendingBar[propName] = val
+      this.outputPendingBar[propName] = val;
     },
     OPBRemoveProp(propId) {
-        this.outputPendingBar.removeProp(propId)
+      this.outputPendingBar.removeProp(propId);
+    },
+
+    // Actions related to altering the state of the pending and successful message
+    checkPendings() {
+      //const currentInvoiceData = invoicesStore.invoiceData;
+      const index = this.invoiceData.findIndex(
+        (invoice) => invoice.status === "Pending"
+      );
+
+      if (index === -1) {
+        this.updateHasPending(false);
+      }
+
+      //invoiceArr.value = [...invoicesStore.invoiceData];
+    },
+    checkSuccess() {
+      //const currentInvoiceData = invoicesStore.invoiceData;
+      const index = this.invoiceData.findIndex(
+        (invoice) => invoice.status === "Successful"
+      );
+
+      if (index !== -1) {
+        this.updateHasSuccess(true);
+      } else {
+        this.updateHasSuccess(false);
+      }
     },
   },
   getters: {
     outputInvoiceData(state) {
-        return state.invoiceData
+      return state.invoiceData;
     },
-  }
+  },
 });
 
 let invoiceData = [
@@ -104,32 +130,31 @@ let invoiceData = [
 ];
 
 const clientList = [
-    {
-      name: 'Fish Lim',
-      photo: 'src/assets/images/fish.jpg'
-    },
-    {
-      name: 'Bird Santos',
-      photo: 'src/assets/images/bird.jpg'
-    },
-    {
-      name: 'Cow Escoda',
-      photo: 'src/assets/images/cow.jpg'
-    },
-    {
-      name: 'Crane Popcorn',
-      photo: 'src/assets/images/crane.jpg'
-    },
-    {
-      name: 'Frog Tuiles',
-      photo: 'src/assets/images/frog.jpg'
-    },
-    {
-      name: 'Axolotl Joconde',
-      photo: 'src/assets/images/axolotl.jpg'
-    },
-    
-  ]
+  {
+    name: "Fish Lim",
+    photo: "src/assets/images/fish.jpg",
+  },
+  {
+    name: "Bird Santos",
+    photo: "src/assets/images/bird.jpg",
+  },
+  {
+    name: "Cow Escoda",
+    photo: "src/assets/images/cow.jpg",
+  },
+  {
+    name: "Crane Popcorn",
+    photo: "src/assets/images/crane.jpg",
+  },
+  {
+    name: "Frog Tuiles",
+    photo: "src/assets/images/frog.jpg",
+  },
+  {
+    name: "Axolotl Joconde",
+    photo: "src/assets/images/axolotl.jpg",
+  },
+];
 
 // State that controls modal visibility
 const addInvoiceModalIsVisible = false;
@@ -149,18 +174,17 @@ const hasSuccess = null;
 // Misc
 
 const outputPendingBar = {
-    addNewProp(name) {
-      this[name] = 0;
-      this[`${name}SI`] = null;
-      this[`${name}ST`] = null;
-      this[`${name}invoiceId`] = name;
-      this[`${name}notificationId`] = null;
-    },
-    removeProp(name) {
-      delete this[name];
-      delete this[`${name}SI`];
-      delete this[`${name}ST`];
-      delete this[`${name}invoiceId`];
-    },
-  };
-
+  addNewProp(name) {
+    this[name] = 0;
+    this[`${name}SI`] = null;
+    this[`${name}ST`] = null;
+    this[`${name}invoiceId`] = name;
+    this[`${name}notificationId`] = null;
+  },
+  removeProp(name) {
+    delete this[name];
+    delete this[`${name}SI`];
+    delete this[`${name}ST`];
+    delete this[`${name}invoiceId`];
+  },
+};

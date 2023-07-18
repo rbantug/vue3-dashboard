@@ -1,9 +1,9 @@
 <template>
   <!-- Modal for confirmation when removing an invoice -->
 
-  <BaseWarningModal :warning-modal-is-visible="dashboard.deleteInvoiceModalIsVisible" @emit-yes-btn="yesBtn" @emit-no-btn="closeModal" modal-height="h-[16rem]" modal-width="w-[25rem] " icon-color="red">
+  <BaseWarningModal :warning-modal-is-visible="invoicesStore.deleteInvoiceModalIsVisible" @emit-yes-btn="yesBtn" @emit-no-btn="closeModal" modal-height="h-[16rem]" modal-width="w-[25rem] " icon-color="red">
     <template v-slot:default>
-      <span class="text-center">Do you want to remove Invoice # {{ dashboard.invoiceDataToBeRemoved.id }}?</span>
+      <span class="text-center">Do you want to remove Invoice # {{ invoicesStore.invoiceDataToBeRemoved.id }}?</span>
     </template>
   </BaseWarningModal>
 
@@ -215,14 +215,16 @@ function deleteInvoice(invoice) {
   // remove the invoice
 
   if(invoice.status === 'Pending') {
-    dashboard.deleteSingleInvoice(invoice.id)
+    invoicesStore.deleteSingleInvoice(invoice.id)
     clearInterval(invoicesStore.outputPendingBar[`${invoice.id}SI`])
     clearTimeout(invoicesStore.outputPendingBar[`${invoice.id}ST`])
-    emits('cancelPendingInvoice')
+    invoicesStore.checkPendings()
+    //emits('cancelPendingInvoice')
   } 
   if(invoice.status === 'Successful') {
-    dashboard.deleteSingleInvoice(invoice.id)
-    emits('deleteSuccessfulInvoice')
+    invoicesStore.deleteSingleInvoice(invoice.id)
+    //emits('deleteSuccessfulInvoice')
+    invoicesStore.checkSuccess()
   }
 }
 //////////////////////
@@ -232,18 +234,18 @@ function deleteInvoice(invoice) {
 let tempDeleteBtnRef = ref(null)
 
 function openModal(invoice, event) {
-  dashboard.updateInvData2BeRemoved(invoice)
-  dashboard.updateDelInvModalVisibility(true)
+  invoicesStore.updateInvData2BeRemoved(invoice)
+  invoicesStore.updateDelInvModalVisibility(true)
   tempDeleteBtnRef.value = event.target
 }
 
 function closeModal() {
-  dashboard.updateDelInvModalVisibility(false)
+  invoicesStore.updateDelInvModalVisibility(false)
   tempDeleteBtnRef.value.focus()
 } 
 
 function yesBtn() {
-  deleteInvoice(dashboard.invoiceDataToBeRemoved)
+  deleteInvoice(invoicesStore.invoiceDataToBeRemoved)
   closeModal()
 
   if(dashboard.invoiceData.length !== 0) {

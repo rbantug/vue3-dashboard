@@ -95,8 +95,8 @@
                   <div
                     v-if="notify.showCancelBtn"
                     class="mt-2 text-sm cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
-                    @click="deleteInvoiceInNotification(notify)"
-                    @keydown="deleteInvoiceInNotification(notify)"  
+                    @click="deleteInvoiceInNotification(notify, $event)"
+                    @keydown="deleteInvoiceInNotification(notify, $event)"  
                     tabindex="0"
                   >
                     Cancel
@@ -165,15 +165,17 @@ import {
     PopoverPanel,
 } from '@headlessui/vue'
 import { useDashboardStore } from "../stores/useDashboard"
+import { useInvoicesStore } from '../stores/useInvoice';
 
 const dashboard = useDashboardStore()
+const invoicesStore = useInvoicesStore()
 
 function removeNotificationPulse(e) {
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") dashboard.toggleNotifyPing(false)
 }
 
 function showInvoicesViewAll(e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") dashboard.showInvoicesViewAll()
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") invoicesStore.showInvoicesViewAll()
 }
 
 function deleteTransferFromNotification(company, e) {
@@ -256,14 +258,14 @@ function removeSingleNotification(id, index, e) {
   }
 }
 
-function deleteInvoiceInNotification(notify) {
+function deleteInvoiceInNotification(notify, e) {
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") {
-    const invoice = dashboard.invoiceData.find(invoice => invoice.id === notify.invoiceId)
-    dashboard.invoiceDataToBeRemoved = invoice
+    const invoice = invoicesStore.invoiceData.find(invoice => invoice.id === notify.invoiceId)
+    invoicesStore.updateInvData2BeRemoved(invoice)
     if(invoice.status === 'Pending') {
       dashboard.pendingNotifyIdDeleteInvoice = notify.id
     }
-    dashboard.deleteInvoiceModalIsVisible = true
+    invoicesStore.updateDelInvModalVisibility(true)
   }
 
 }

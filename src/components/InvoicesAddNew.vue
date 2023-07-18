@@ -123,8 +123,8 @@ const dashboard = useDashboardStore();
 
 const props = defineProps({
   newInvoiceBtnRef: {
-    type: String,
-    required: false,
+    type: [HTMLButtonElement, null],
+    required: true,
   },
 });
 
