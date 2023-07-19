@@ -60,13 +60,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineAsyncComponent } from "vue";
 import { Icon } from "@iconify/vue";
 import InvoicesTable from "./Utils/InvoicesTable.vue";
 import { useInvoicesStore } from "../stores/useInvoice"
 
-import InvoicesAddNew from "./InvoicesAddNew.vue";
-import InvoicesViewAll from "./InvoicesViewAll.vue";
+const InvoicesAddNew = defineAsyncComponent(() => import('./InvoicesAddNew.vue'))
+const InvoicesViewAll = defineAsyncComponent(() => import('./InvoicesViewAll.vue'))
 
 const invoicesStore = useInvoicesStore()
 
