@@ -3,12 +3,6 @@ import { defineStore } from 'pinia'
 export const useDashboardStore = defineStore('dashboard', {
     state: () => ({
         recentTransactionData,
-        /* pendingNotifyIdDeleteInvoice,
-        msgNotification,
-        notifications,
-        notifyPingIsVisible,
-        msgPingIsVisible,
-        lastNotificationId, */
         addedAccountsList,
     }),
     getters: {},
@@ -18,45 +12,9 @@ export const useDashboardStore = defineStore('dashboard', {
 
           this.msgNotification.splice(index, 1)
         },
-        /*toggleNotifyPing(boolean) {
-          this.notifyPingIsVisible = boolean
-        },
-        toggleMsgPing(boolean) {
-          this.msgPingIsVisible = boolean
-        },
-        updateNotifications(val) {
-          this.notifications.unshift(val)
-          this.toggleNotifyPing(true)
-        },
-        updateNotifyCancelBtn(id) {
-          const index = this.notifications.findIndex(notify => notify.id === id)
-
-          notifications[index].showCancelBtn = false
-        },
-        removeNotification(id) {
-          const index = this.notifications.findIndex(notify => notify.id === id)
-
-          this.notifications.splice(index, 1)
-        },
-        updateLastNotificationId(id) {
-          this.lastNotificationId = id
-        },
-        updatePendingNotifyId(val) {
-          this.pendingNotifyIdDeleteInvoice = val
-        }, */
-        /* updateOutputPendingBar(obj) {
-          this.outputPendingBar = obj
-        }, */
         addNewAccount(acct) {
           this.addedAccountsList.push(acct)
         },
-        /* removeTransferBtnFromNotification(companyName) {
-          const index = this.notifications.findIndex(notify => notify.company === companyName
-          )
-          if(index !== -1) {
-            this.notifications[index].showRemoveBtn = false
-          }
-        }, */
     }   
     
 })
@@ -140,44 +98,5 @@ const recentTransactionData = [
       balance: 6750
     }
   ]
-
-let pendingNotifyIdDeleteInvoice = 0
-
-const msgNotification = [
-  {
-    id: 1000,
-    title: 'message 1',
-    message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, error!',
-    imageSrc: 'src/assets/images/bird.jpg'
-  },
-  {
-    id: 1001,
-    title: 'message 2',
-    message: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum excepturi quae illo!',
-    imageSrc: 'src/assets/images/frog.jpg'
-  },
-  {
-    id: 1002,
-    title: 'message 3',
-    message: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minima, odit esse omnis recusandae odio amet.',
-    imageSrc: 'src/assets/images/cow.jpg'
-  },
-  {
-    id: 1003,
-    title: 'message 4',
-    message: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minima, odit esse omnis recusandae odio amet.',
-    imageSrc: 'src/assets/images/axolotl.jpg'
-  },
-]
-
-let notifications = []
-
-let notifyPingIsVisible = false
-
-let  msgPingIsVisible = true
-
-let lastNotificationId = 100000
-
-//let outputPendingBar = null
 
 let addedAccountsList = []
