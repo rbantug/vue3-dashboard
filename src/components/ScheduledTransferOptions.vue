@@ -316,26 +316,16 @@ import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumb
 import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
 import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
+
 import { useTransferStore } from "../stores/useTransfer";
+import { useNotificationStore } from "../stores/useNotification";
 
 const transferStore = useTransferStore();
+const notificationStore = useNotificationStore();
 
 const backBtnRef = ref(null)
 
 const emits = defineEmits(['emitCreateCarouselSubscription'])
-
-function resetOptionsData() {
-    transferStore.updateNewSubBilling = 'Monthly'
-  transferStore.updateMonthConditional(transferStore.currentMonth !== 11 ? transferStore.updateCurrentMonth(transferStore.currentMonth + 1) : 0)
-  transferStore.updateDurationYear(transferStore.currentYear)
-  transferStore.updateDurationErrorMonth(false)
-  transferStore.updateDurationErrorYear(false)
-  transferStore.updateDurationErrorCurrentYear(false)
-  transferStore.updateCheckboxState(false)
-  transferStore.updateReminderChoice("one day")
-  transferStore.updateDescriptionVmodel(null)
-  transferStore.updatePaymentNetworkVModel(transferStore.paymentMethodArr[0]);
-}
 
 function backBtnNewTransfer() {
   transferStore.updateNewTransferOptions(false);
@@ -429,11 +419,11 @@ function closeDeleteTransferModal() {
 
 function deleteTransfer() {
   // get the company name for the notification and toast
-  const companyToBeDeleted =
-    transferStore.tempSelectedSubscription.company || transferStore.deleteTransferCompany;
+  const companyToBeDeleted = transferStore.editTransferOptions ? 
+    transferStore.tempSelectedSubscription.company : transferStore.deleteTransferCompany;
 
   // Remove the "Remove transfer" button from the "New transfer added notification"
-  dashboard.removeTransferBtnFromNotification(companyToBeDeleted);
+  notificationStore.removeTransferBtnFromNotification(companyToBeDeleted);
 
   // update the carousel
   const newCurrentSubscription = transferStore.currentSubscription.filter(
@@ -456,8 +446,8 @@ function deleteTransfer() {
   });
 
   const notificationId =
-    dashboard.lastNotificationId + Math.floor(getRandomNumber(1, 500));
-  dashboard.updateNotifications({
+    notificationStore.lastNotificationId + Math.floor(getRandomNumber(1, 500));
+  notificationStore.updateNotifications({
     id: notificationId,
     type: "transfer",
     status: "deleted",
@@ -466,12 +456,12 @@ function deleteTransfer() {
     showCancelBtn: false,
     showRemoveBtn: false,
   });
-  dashboard.updateLastNotificationId(notificationId);
+  notificationStore.updateLastNotificationId(notificationId);
 
   transferStore.closeDeleteTransferModal();
 }
 
-defineExpose({ resetOptionsData, monthlyBtnRef })
+defineExpose({ monthlyBtnRef })
 
 onMounted(() => {
   transferStore.getBackBtnTransferOptionsRef(backBtnRef.value)

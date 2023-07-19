@@ -167,10 +167,12 @@ import {
 import { useDashboardStore } from "../stores/useDashboard"
 import { useInvoicesStore } from '../stores/useInvoice';
 import { useNotificationStore } from '../stores/useNotification';
+import { useTransferStore } from '../stores/useTransfer';
 
 const dashboard = useDashboardStore()
 const invoicesStore = useInvoicesStore()
 const notificationStore = useNotificationStore();
+const transferStore = useTransferStore();
 
 function removeNotificationPulse(e) {
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") notificationStore.toggleNotifyPing(false)
@@ -181,7 +183,7 @@ function showInvoicesViewAll(e) {
 }
 
 function deleteTransferFromNotification(company, e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") notificationStore.deleteTransferFromNotification(company)
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") transferStore.deleteTransferFromNotification(company)
 }
 
 const outputNotificationList = computed(() => {

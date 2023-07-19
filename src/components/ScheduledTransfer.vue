@@ -208,23 +208,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick, defineAsyncComponent } from "vue";
 import { Icon } from "@iconify/vue";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Navigation } from "vue3-carousel";
 import BaseModal from "./Base Components/BaseModal.vue";
 import { toast } from "vue3-toastify";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
-import { useDashboardStore } from "../stores/useDashboard";
+
 import { useTransferStore } from "../stores/useTransfer"
+import { useNotificationStore } from "../stores/useNotification";
 
-import ScheduledTransferList from "./ScheduledTransferList.vue"
-import ScheduledTransferOptions from "./ScheduledTransferOptions.vue";
-import ScheduledTransferSummary from "./ScheduledTransferSummary.vue";
-import ScheduledTransferSuccess from "./ScheduledTransferSuccess.vue";
+const ScheduledTransferList = defineAsyncComponent(() => import('./ScheduledTransferList.vue'))
+const ScheduledTransferOptions = defineAsyncComponent(() => import('./ScheduledTransferOptions.vue'))
+const ScheduledTransferSummary = defineAsyncComponent(() => import('./ScheduledTransferSummary.vue'))
+const ScheduledTransferSuccess = defineAsyncComponent(() => import('./ScheduledTransferSuccess.vue'))
 
-const dashboard = useDashboardStore();
 const transferStore = useTransferStore();
+const notificationStore = useNotificationStore()
 
 // Component Refs
 const scheduledTransferOptionsRef = ref(null)
@@ -265,7 +266,18 @@ function toggleModalNewTransfer() {
   transferStore.updateNewTransferOptions(false);
   transferStore.updateSubTransactSummary(false);
   transferStore.updateShowSuccessWindow(false);
-  scheduledTransferOptionsRef.value?.resetOptionsData()
+
+  transferStore.updateNSBilling('Monthly')
+  transferStore.updateMonthConditional(transferStore.currentMonth !== 11 ? transferStore.currentMonth + 1 : 0)
+
+  transferStore.updateDurationYear(transferStore.currentYear)
+  transferStore.updateDurationErrorMonth(false)
+  transferStore.updateDurationErrorYear(false)
+  transferStore.updateDurationErrorCurrentYear(false)
+  transferStore.updateCheckboxState(false)
+  transferStore.updateReminderChoice("one day")
+  transferStore.updateDescriptionVmodel(null)
+  transferStore.updatePaymentNetworkVModel(transferStore.paymentMethodArr[0])
 
   if(transferStore.addNewTransferModalIsVisible) {
     nextTick(() => {
@@ -444,8 +456,8 @@ function addSubscription(type) {
     );
 
     const notificationId =
-      dashboard.lastNotificationId + Math.floor(getRandomNumber(1, 500));
-    dashboard.updateNotifications({
+      notificationStore.lastNotificationId + Math.floor(getRandomNumber(1, 500));
+    notificationStore.updateNotifications({
       id: notificationId,
       type: "transfer",
       status: "successful",
@@ -454,7 +466,7 @@ function addSubscription(type) {
       showCancelBtn: false,
       showRemoveBtn: true,
     });
-    dashboard.updateLastNotificationId(notificationId);
+    notificationStore.updateLastNotificationId(notificationId);
   }, 5000);
 }
 
