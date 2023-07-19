@@ -3,23 +3,22 @@ import { defineStore } from 'pinia'
 export const useDashboardStore = defineStore('dashboard', {
     state: () => ({
         recentTransactionData,
-        pendingNotifyIdDeleteInvoice,
+        /* pendingNotifyIdDeleteInvoice,
         msgNotification,
         notifications,
         notifyPingIsVisible,
         msgPingIsVisible,
-        lastNotificationId,
-        outputPendingBar,
+        lastNotificationId, */
         addedAccountsList,
     }),
     getters: {},
     actions: {
-        removeMessage(id) {
+         removeMessage(id) {
           const index = this.msgNotification.findIndex(notify => notify.id === id)
 
           this.msgNotification.splice(index, 1)
         },
-        toggleNotifyPing(boolean) {
+        /*toggleNotifyPing(boolean) {
           this.notifyPingIsVisible = boolean
         },
         toggleMsgPing(boolean) {
@@ -44,20 +43,20 @@ export const useDashboardStore = defineStore('dashboard', {
         },
         updatePendingNotifyId(val) {
           this.pendingNotifyIdDeleteInvoice = val
-        },
-        updateOutputPendingBar(obj) {
+        }, */
+        /* updateOutputPendingBar(obj) {
           this.outputPendingBar = obj
-        },
+        }, */
         addNewAccount(acct) {
           this.addedAccountsList.push(acct)
         },
-        removeTransferBtnFromNotification(companyName) {
+        /* removeTransferBtnFromNotification(companyName) {
           const index = this.notifications.findIndex(notify => notify.company === companyName
           )
           if(index !== -1) {
             this.notifications[index].showRemoveBtn = false
           }
-        },
+        }, */
     }   
     
 })
@@ -179,6 +178,6 @@ let  msgPingIsVisible = true
 
 let lastNotificationId = 100000
 
-let outputPendingBar = null
+//let outputPendingBar = null
 
 let addedAccountsList = []

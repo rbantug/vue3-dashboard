@@ -4,11 +4,11 @@
       class="p-2 bg-gray-900 rounded-full text-gray-300 outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white duration-300"
       @click="removeNotificationPulse"
       @keydown="removeNotificationPulse"
-      :aria-label="dashboard.notifyPingIsVisible ? 'new notifications available': 'notifications'"
+      :aria-label="notificationStore.notifyPingIsVisible ? 'new notifications available': 'notifications'"
     >
       <Icon icon="mdi:bell-outline" class="h-5 w-5" aria-hidden="true" />
       <div
-        v-if="dashboard.notifyPingIsVisible"
+        v-if="notificationStore.notifyPingIsVisible"
         class="absolute top-2 right-2 flex h-2 w-2"
       >
         <span
@@ -31,7 +31,7 @@
       >
         <div
           class="h-24 flex justify-center items-center text-white"
-          v-if="dashboard.notifications.length === 0" role="alert"
+          v-if="notificationStore.notifications.length === 0" role="alert"
         >
           There are no notifications
         </div>
@@ -144,7 +144,7 @@
           </transition-group>
         </div>
         <div
-          v-if="dashboard.notifications.length > 3"
+          v-if="notificationStore.notifications.length > 3"
           class="h-[2.5rem] flex justify-center items-center border-t hover:bg-gray-600 cursor-pointer duration-300"
           tabindex="0"
           role="button"
@@ -166,12 +166,14 @@ import {
 } from '@headlessui/vue'
 import { useDashboardStore } from "../stores/useDashboard"
 import { useInvoicesStore } from '../stores/useInvoice';
+import { useNotificationStore } from '../stores/useNotification';
 
 const dashboard = useDashboardStore()
 const invoicesStore = useInvoicesStore()
+const notificationStore = useNotificationStore();
 
 function removeNotificationPulse(e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") dashboard.toggleNotifyPing(false)
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") notificationStore.toggleNotifyPing(false)
 }
 
 function showInvoicesViewAll(e) {
@@ -179,11 +181,11 @@ function showInvoicesViewAll(e) {
 }
 
 function deleteTransferFromNotification(company, e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") dashboard.deleteTransferFromNotification(company)
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") notificationStore.deleteTransferFromNotification(company)
 }
 
 const outputNotificationList = computed(() => {
-  let notificationList = [...dashboard.notifications]
+  let notificationList = [...notificationStore.notifications]
   return notificationList.slice(0,3)
 })
 
@@ -247,11 +249,11 @@ let refList = ref([])
 
 function removeSingleNotification(id, index, e) {
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") {
-    dashboard.removeNotification(id)
+    notificationStore.removeNotification(id)
 
-    if(!dashboard.notifications.length) return 
+    if(!notificationStore.notifications.length) return 
 
-    let notifyIndex = dashboard.notifications.length === index ? dashboard.notifications.length - 1 : index
+    let notifyIndex = notificationStore.notifications.length === index ? notificationStore.notifications.length - 1 : index
     refList.value[notifyIndex].children[0].removeAttribute('aria-live')
     refList.value[notifyIndex].children[0].setAttribute('aria-live', 'assertive')
     refList.value[notifyIndex].focus()
@@ -263,16 +265,10 @@ function deleteInvoiceInNotification(notify, e) {
     const invoice = invoicesStore.invoiceData.find(invoice => invoice.id === notify.invoiceId)
     invoicesStore.updateInvData2BeRemoved(invoice)
     if(invoice.status === 'Pending') {
-      dashboard.pendingNotifyIdDeleteInvoice = notify.id
+      notificationStore.pendingNotifyIdDeleteInvoice = notify.id
     }
     invoicesStore.updateDelInvModalVisibility(true)
   }
 
 }
 </script>
-
-<!-- <style scoped>
-.v-move {
-  transition: transform 1s cubic-bezier(0.55, 0, 0.1, 1);
-}
-</style> -->

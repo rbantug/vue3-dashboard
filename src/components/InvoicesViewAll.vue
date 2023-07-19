@@ -74,6 +74,7 @@
 import { ref } from 'vue'
 import BaseModal from './Base Components/BaseModal.vue'
 import InvoicesTable from './Utils/InvoicesTable.vue';
+
 import { useInvoicesStore } from "../stores/useInvoice";
 
 const invoicesStore = useInvoicesStore();

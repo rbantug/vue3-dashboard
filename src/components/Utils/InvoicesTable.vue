@@ -125,11 +125,12 @@ import { ref, computed, toRef } from 'vue'
 import BaseWarningModal from '../Base Components/BaseWarningModal.vue';
 import { getRandomNumber } from '../../composables-and-reusable-logic/getRandomNumber';
 import { toast } from "vue3-toastify";
-import { useDashboardStore } from '../../stores/useDashboard';
-import { useInvoicesStore } from '../../stores/useInvoice';
 
-const dashboard = useDashboardStore();
+import { useInvoicesStore } from '../../stores/useInvoice';
+import { useNotificationStore } from '../../stores/useNotification';
+
 const invoicesStore = useInvoicesStore();
+const notificationStore = useNotificationStore();
 
 const props = defineProps({
   recentInvoice: {
@@ -188,8 +189,8 @@ function deleteInvoice(invoice) {
   // if invoice status is pending, remove pending notification
 
   if(invoice.status === 'pending') {
-    dashboard.removeNotification(dashboard.pendingNotifyIdDeleteInvoice)
-    dashboard.updatePendingNotifyId(0)
+    notificationStore.removeNotification(notificationStore.pendingNotifyIdDeleteInvoice)
+    notificationStore.updatePendingNotifyId(0)
   }
 
   // create notification before removing the invoice
@@ -201,16 +202,16 @@ function deleteInvoice(invoice) {
       transition: toast.TRANSITIONS.SLIDE,
     });
 
-  const newNotificationId = dashboard.lastNotificationId + Math.floor(getRandomNumber(0, 500))
+  const newNotificationId = notificationStore.lastNotificationId + Math.floor(getRandomNumber(0, 500))
 
-  dashboard.updateNotifications({
+  notificationStore.updateNotifications({
       id: newNotificationId,
       type: 'invoice',
       status: 'deleted',
       message: `Invoice #${invoice.id} was deleted`,
       showCancelBtn: false,
     })
-    dashboard.updateLastNotificationId(newNotificationId) 
+    notificationStore.updateLastNotificationId(newNotificationId) 
 
   // remove the invoice
 
@@ -219,11 +220,10 @@ function deleteInvoice(invoice) {
     clearInterval(invoicesStore.outputPendingBar[`${invoice.id}SI`])
     clearTimeout(invoicesStore.outputPendingBar[`${invoice.id}ST`])
     invoicesStore.checkPendings()
-    //emits('cancelPendingInvoice')
+    notificationStore.updateNotifyCancelBtn(invoice.id, 'invoice')
   } 
   if(invoice.status === 'Successful') {
     invoicesStore.deleteSingleInvoice(invoice.id)
-    //emits('deleteSuccessfulInvoice')
     invoicesStore.checkSuccess()
   }
 }
@@ -241,14 +241,18 @@ function openModal(invoice, event) {
 
 function closeModal() {
   invoicesStore.updateDelInvModalVisibility(false)
-  tempDeleteBtnRef.value.focus()
+  if(invoicesStore.stateInvoicesViewAll) {
+    tempDeleteBtnRef.value.focus()
+  }
 } 
 
 function yesBtn() {
   deleteInvoice(invoicesStore.invoiceDataToBeRemoved)
   closeModal()
 
-  if(dashboard.invoiceData.length !== 0) {
+  if(!invoicesStore.stateInvoicesViewAll) return
+
+  if(invoicesStore.invoiceData.length !== 0) {
     tempDeleteBtnRef.value.parentElement.parentElement.children[0].children[5].focus()
   } else {
     emits('focusModalCloseBtn')

@@ -4,11 +4,11 @@
       class="p-2 bg-gray-900 rounded-full text-gray-300 outline-none hover:ring-1 hover:ring-white hover:text-white focus-visible:ring-1 focus-visible:ring-white duration-300"
       @click="removeMsgNotificationPulse"
       @keydown="removeMsgNotificationPulse"
-      :aria-label="dashboard.msgPingIsVisible ? 'new messages available': 'messages'"
+      :aria-label="notificationStore.msgPingIsVisible ? 'new messages available': 'messages'"
     >
       <Icon icon="uil:envelope" class="h-5 w-5" aria-hidden="true" />
       <div
-        v-if="dashboard.msgPingIsVisible"
+        v-if="notificationStore.msgPingIsVisible"
         class="absolute top-2 right-2 flex h-2 w-2"
       >
         <span
@@ -31,7 +31,7 @@
       >
       <div
           class="h-24 flex justify-center items-center text-white"
-          v-if="dashboard.msgNotification.length === 0" role="alert"
+          v-if="notificationStore.msgNotification.length === 0" role="alert"
         >
           There are no messages
         </div>
@@ -68,7 +68,7 @@
           </div>
         </TransitionGroup>
           <div
-          v-if="dashboard.msgNotification.length > 3"
+          v-if="notificationStore.msgNotification.length > 3"
           class="h-[2.5rem] flex justify-center items-center border-t hover:bg-gray-600 focus:bg-gray-600 cursor-pointer duration-300"
           tabindex="0"
           role="button"
@@ -85,12 +85,15 @@
 import { ref, computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
+
 import { useDashboardStore } from "../stores/useDashboard";
+import { useNotificationStore } from "../stores/useNotification";
 
 const dashboard = useDashboardStore();
+const notificationStore = useNotificationStore();
 
 const outputMessageList = computed(() => {
-  let messageList = [...dashboard.msgNotification]
+  let messageList = [...notificationStore.msgNotification]
   if (messageList.length > 3) {
     return messageList.slice(0,3)
   } else {
@@ -99,7 +102,7 @@ const outputMessageList = computed(() => {
 })
 
 function removeMsgNotificationPulse(e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") dashboard.toggleMsgPing(false)
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") notificationStore.toggleMsgPing(false)
 }
 
 let refList = ref([])
@@ -108,7 +111,7 @@ function removeSingleMessage(id, index, e) {
 
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") {    
     dashboard.removeMessage(id)
-    let msgIndex = dashboard.msgNotification.length === index ? dashboard.msgNotification.length - 1 : index
+    let msgIndex = notificationStore.msgNotification.length === index ? notificationStore.msgNotification.length - 1 : index
     refList.value[msgIndex].children[0].removeAttribute('aria-live')
     refList.value[msgIndex].children[0].setAttribute('aria-live', 'assertive')
     refList.value[msgIndex].focus()

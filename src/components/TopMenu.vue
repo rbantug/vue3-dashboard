@@ -146,19 +146,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from "vue";
 import { Icon } from "@iconify/vue";
-import { ref, computed, onMounted } from "vue";
-import { useDashboardStore } from "../stores/useDashboard";
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
-  ComboboxButton,
-  TransitionRoot,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
   Menu,
   MenuButton,
   MenuItems,
@@ -167,11 +157,16 @@ import {
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
 import { getRandomNumber } from '../composables-and-reusable-logic/getRandomNumber'
-import NotifyNotification from "./NotifyNotification.vue";
-import MessageNotification from "./MessageNotification.vue"
 import BaseCombobox from "./Base Components/BaseCombobox.vue";
 
+import NotifyNotification from "./NotifyNotification.vue";
+import MessageNotification from "./MessageNotification.vue"
+
+import { useDashboardStore } from "../stores/useDashboard";
+import { useNotificationStore } from "../stores/useNotification";
+
 const dashboard = useDashboardStore();
+const notificationStore = useNotificationStore();
 
 /////////////////////////////
 // Search Bar
@@ -223,15 +218,15 @@ function addAccount() {
   })
 
   // add new notification
-  const notificationId = dashboard.lastNotificationId + Math.floor(getRandomNumber(0, 500))
-  dashboard.updateNotifications({
+  const notificationId = notificationStore.lastNotificationId + Math.floor(getRandomNumber(0, 500))
+  notificationStore.updateNotifications({
     id: notificationId,
     type: 'account',
     status: 'successful',
     message: `${selectedAccount.value.text} was added. Hooray 🎉`,
     showCancelBtn: false
   })
-  dashboard.updateLastNotificationId(notificationId)
+  notificationStore.updateLastNotificationId(notificationId)
 }
 
 ///////////////////////////////
@@ -239,7 +234,7 @@ function addAccount() {
 ///////////////////////////////
 
 onMounted(() => {
-  dashboard.msgNotification.forEach(msg => {
+  notificationStore.msgNotification.forEach(msg => {
     if (msg.message.length > 80) {
       msg.message = msg.message.substring(0, 80) + '...'
     }

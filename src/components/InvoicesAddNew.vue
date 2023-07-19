@@ -116,10 +116,10 @@ import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumb
 import { toast } from "vue3-toastify";
 
 import { useInvoicesStore } from "../stores/useInvoice";
-import { useDashboardStore } from "../stores/useDashboard";
+import { useNotificationStore } from "../stores/useNotification";
 
 const invoicesStore = useInvoicesStore();
-const dashboard = useDashboardStore();
+const notificationStore = useNotificationStore();
 
 const props = defineProps({
   newInvoiceBtnRef: {
@@ -232,7 +232,7 @@ function formSubmit() {
   closeModal();
   invoiceArr.value = [...invoicesStore.invoiceData];
   let notificationId =
-    dashboard.lastNotificationId + Math.floor(getRandomNumber(0, 500));
+  notificationStore.lastNotificationId + Math.floor(getRandomNumber(0, 500));
   runPendingInvoiceBar(`${newId}`, notificationId);
   //refInvoiceTable.value?.updateInvoiceArr();
   invoicesStore.updateHasPending(true);
@@ -246,7 +246,7 @@ function formSubmit() {
     transition: toast.TRANSITIONS.SLIDE,
   });
 
-  dashboard.updateNotifications({
+  notificationStore.updateNotifications({
     id: notificationId,
     type: "invoice",
     status: "pending",
@@ -254,24 +254,20 @@ function formSubmit() {
     showCancelBtn: true,
     invoiceId: newId,
   });
-  dashboard.updateLastNotificationId(notificationId);
+  notificationStore.updateLastNotificationId(notificationId);
 
   dateFormData.value = "";
   amountFormData.value = 0;
 }
 
 function runPendingInvoiceBar(propId, notificationId) {
-  //outputPendingBar.value.addNewProp(propId);
   invoicesStore.updateOPBAddNewProp(propId)
   let tempTime = 10000;
 
-  //outputPendingBar.value[`${propId}notificationId`] = notificationId;
   invoicesStore.updateOPBPropValue(`${propId}notificationId`, notificationId)
 
-  //outputPendingBar.value[`${propId}SI`] =
   invoicesStore.updateOPBPropValue(`${propId}SI`, setInterval(() => {
     tempTime = getRandomNumber(5000, 10000);
-    //outputPendingBar.value[propId] += 25;
     invoicesStore.updateOPBPropValue(propId, invoicesStore.outputPendingBar[propId] + 25)
     if (invoicesStore.outputPendingBar[propId] >= 100) {
       clearInterval(invoicesStore.outputPendingBar[`${propId}SI`]);
@@ -279,11 +275,9 @@ function runPendingInvoiceBar(propId, notificationId) {
         const getIndex = invoiceArr.value.findIndex((el) => el.id == propId);
         invoiceArr.value[getIndex].status = "Successful";
         invoicesStore.updateHasSuccess(true)
-        //outputPendingBar.value.removeProp(propId)
 
         // state management for "There are no pending invoices" message in All Invoices modal
         emits('runCheckPendings')
-        //checkPendings();
 
         // Add toast and notification for successful invoice
 
@@ -301,18 +295,18 @@ function runPendingInvoiceBar(propId, notificationId) {
 
         // If the pending notification was deleted before we get the successful notification, the successful notification will push through.
         const checkIfCurrentNotificationExist =
-          dashboard.notifications.findIndex(
+          notificationStore.notifications.findIndex(
             (notify) => notify.id === notificationId
           );
 
         if (checkIfCurrentNotificationExist !== -1) {
-          dashboard.updateNotifyCancelBtn(notificationId);
+          notificationStore.updateNotifyCancelBtn(notificationId);
         }
 
         const newNotificationId =
-          dashboard.lastNotificationId + Math.floor(getRandomNumber(0, 500));
+          notificationStore.lastNotificationId + Math.floor(getRandomNumber(0, 500));
 
-        dashboard.updateNotifications({
+          notificationStore.updateNotifications({
           id: newNotificationId,
           type: "invoice",
           status: "successful",
@@ -322,10 +316,10 @@ function runPendingInvoiceBar(propId, notificationId) {
           showCancelBtn: false,
           invoiceId: newId,
         });
-        dashboard.updateLastNotificationId(newNotificationId);
+        notificationStore.updateLastNotificationId(newNotificationId);
 
         // remove pending notification after showing the successful notification
-        dashboard.removeNotification(
+        notificationStore.removeNotification(
           invoicesStore.outputPendingBar[`${propId}notificationId`]
         );
 
@@ -333,7 +327,5 @@ function runPendingInvoiceBar(propId, notificationId) {
       }, 1000))
     }
   }, tempTime))
-
-  //dashboard.updateOutputPendingBar(outputPendingBar.value);
 }
 </script>
