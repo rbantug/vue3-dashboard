@@ -107,7 +107,7 @@ let invoiceData = [
     id: 138711,
     date: "Feb 21, 2021",
     client: "Cow Escoda",
-    clientPhoto: "src/assets/images/cow.jpg",
+    clientPhoto: "src/assets/images/avif_images/cow.avif",
     amount: 1550.0,
     status: "Successful",
   },
@@ -115,7 +115,7 @@ let invoiceData = [
     id: 126511,
     date: "Nov 15, 2020",
     client: "Bird Santos",
-    clientPhoto: "src/assets/images/bird.jpg",
+    clientPhoto: "src/assets/images/avif_images/bird.avif",
     amount: 1200,
     status: "Successful",
   },
@@ -123,7 +123,7 @@ let invoiceData = [
     id: 123456,
     date: "Sep 3, 2020",
     client: "Fish Lim",
-    clientPhoto: "src/assets/images/fish.jpg",
+    clientPhoto: "src/assets/images/avif_images/fish.avif",
     amount: 600,
     status: "Successful",
   },
@@ -132,27 +132,27 @@ let invoiceData = [
 const clientList = [
   {
     name: "Fish Lim",
-    photo: "src/assets/images/fish.jpg",
+    photo: "src/assets/images/avif_images/fish.avif",
   },
   {
     name: "Bird Santos",
-    photo: "src/assets/images/bird.jpg",
+    photo: "src/assets/images/avif_images/bird.avif",
   },
   {
     name: "Cow Escoda",
-    photo: "src/assets/images/cow.jpg",
+    photo: "src/assets/images/avif_images/cow.avif",
   },
   {
     name: "Crane Popcorn",
-    photo: "src/assets/images/crane.jpg",
+    photo: "src/assets/images/avif_images/crane.avif",
   },
   {
     name: "Frog Tuiles",
-    photo: "src/assets/images/frog.jpg",
+    photo: "src/assets/images/avif_images/frog.avif",
   },
   {
     name: "Axolotl Joconde",
-    photo: "src/assets/images/axolotl.jpg",
+    photo: "src/assets/images/avif_images/axolotl.avif",
   },
 ];
 

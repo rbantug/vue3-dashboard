@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineAsyncComponent } from "vue";
 import { Icon } from "@iconify/vue";
 import {
   Menu,
@@ -159,8 +159,8 @@ import 'vue3-toastify/dist/index.css';
 import { getRandomNumber } from '../composables-and-reusable-logic/getRandomNumber'
 import BaseCombobox from "./Base Components/BaseCombobox.vue";
 
-import NotifyNotification from "./NotifyNotification.vue";
-import MessageNotification from "./MessageNotification.vue"
+const NotifyNotification = defineAsyncComponent(() => import('./NotifyNotification.vue'))
+const MessageNotification = defineAsyncComponent(() => import('./MessageNotification.vue'))
 
 import { useDashboardStore } from "../stores/useDashboard";
 import { useNotificationStore } from "../stores/useNotification";
