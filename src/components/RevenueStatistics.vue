@@ -8,6 +8,7 @@
         <h2 class="text-white">Revenue Statistics</h2>
         <button
           class="text-gray-400 hover:cursor-pointer focus:text-white hover:text-white duration-500"
+          aria-label="Revenue Statistics"
         >
           <Icon icon="ph:dots-three-circle" class="h-5 w-5" />
         </button>
