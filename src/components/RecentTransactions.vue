@@ -253,8 +253,9 @@
 
 <script setup>
 import { Icon } from "@iconify/vue";
-import { ref, onMounted, onUpdated, computed } from "vue";
-import BaseModal from "./Base Components/BaseModal.vue";
+import { ref, onMounted, onUpdated, computed, defineAsyncComponent } from "vue";
+
+const BaseModal = defineAsyncComponent(() => import('./Base Components/BaseModal.vue'))
 
 import { useDashboardStore } from "../stores/useDashboard";
 
