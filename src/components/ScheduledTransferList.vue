@@ -46,7 +46,7 @@ function goToTransferOptions(event) {
   );
   transferStore.updateTempSelectedSubscription(temp) 
   nextTick(() => {
-    transferStore.backBtnTransferOptionsRef.focus()
+    transferStore.backBtnTransferOptionsRef?.focus()
   })
 }
 

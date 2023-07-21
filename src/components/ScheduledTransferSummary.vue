@@ -117,7 +117,10 @@ const outputSummaryDuration = computed(() => {
 
   // if the user selected "Yearly" as the billing cycle
   if (transferStore.newSubBilling === "Yearly") {
-    return `${tempYearInteger} year${tempYearInteger > 1 ? "s" : ""}`;
+    const currentDate = new Date()
+    const year = transferStore.durationYear - currentDate.getFullYear()
+
+    return `${year} year${year > 1 ? "s" : ""}`;
   }
 });
 

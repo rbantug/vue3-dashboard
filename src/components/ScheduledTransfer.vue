@@ -235,7 +235,7 @@ const addNewBtnRef = ref(null);
 const editBtnRef = ref(null);
 const baseModalRef = ref(null);
 const deleteBtnRef = ref(null);
-const processingBtnRef = ref()
+const processingBtnRef = ref(null)
 
 const carouselSubscription = ref([]);
 
@@ -281,7 +281,7 @@ function toggleModalNewTransfer() {
 
   if(transferStore.addNewTransferModalIsVisible) {
     nextTick(() => {
-      transferStore.outputFirstTransfer.focus()
+      transferStore.outputFirstTransfer?.focus()
     })
   }
 
@@ -384,7 +384,7 @@ function subscriptionNextBtn() {
   }
   transferStore.updateSubTransactSummary(true)
   nextTick(() => {
-    transferStore.backBtnSummaryWindowRef.focus()
+    transferStore.backBtnSummaryWindowRef?.focus()
   })
 }
 
@@ -404,6 +404,8 @@ function addSubscription(type) {
     }
 
     if (transferStore.newSubBilling === "Yearly") {
+      console.log({date: transferStore.currentDate.getDate(), month: transferStore.monthArr[transferStore.currentDate.getMonth()], year: transferStore.durationYear})
+
       return Date.parse(
         `${transferStore.currentDate.getDate()} ${transferStore.monthArr[transferStore.currentDate.getMonth()]} ${
           transferStore.durationYear
@@ -414,6 +416,7 @@ function addSubscription(type) {
 
   setTimeout(() => {
     let notificationMsg = ''
+    let notificationStatus = ''
     const data = {
       company: transferStore.tempSelectedSubscription.company,
       billing: transferStore.newSubBilling,
@@ -428,12 +431,14 @@ function addSubscription(type) {
     if(type === 'submit') {
       transferStore.currentSubscription.unshift(data);
       notificationMsg = `${transferStore.tempSelectedSubscription.company} was added to your scheduled transfer`
+      notificationStatus = 'successful'
     }
 
     if(type === 'update') {
       const index = transferStore.currentSubscription.findIndex(sub => sub.company === transferStore.tempSelectedSubscription.company)
       transferStore.currentSubscription[index] = data
       notificationMsg = `${transferStore.tempSelectedSubscription.company} subscription details were updated. ` 
+      notificationStatus = 'updated'
     }
 
     transferStore.updateSubTransactSummary(false)
@@ -460,7 +465,7 @@ function addSubscription(type) {
     notificationStore.updateNotifications({
       id: notificationId,
       type: "transfer",
-      status: "successful",
+      status: notificationStatus,
       company: transferStore.tempSelectedSubscription.company,
       message: notificationMsg,
       showCancelBtn: false,
@@ -560,7 +565,7 @@ function selectEditTransfer(sub) {
   editTransferEnabled.value = false;
 
   nextTick(() => {
-    transferStore.monthlyBtnRef.focus()
+    transferStore.monthlyBtnRef?.focus()
   })
 }
 
