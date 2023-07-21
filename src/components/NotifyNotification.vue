@@ -57,6 +57,7 @@
                     'bg-indigo-400/10': notify.status === 'pending',
                     'bg-green-400/10': notify.status === 'successful',
                     'bg-red-400/10': notify.status === 'deleted',
+                    'bg-blue-400/10': notify.status === 'updated',
                   }"
                 >
                   <div
@@ -65,6 +66,7 @@
                       'bg-indigo-400/30': notify.status === 'pending',
                       'bg-green-400/30': notify.status === 'successful',
                       'bg-red-400/30': notify.status === 'deleted',
+                      'bg-blue-400/30': notify.status === 'updated',
                     }"
                   ></div>
                   <Icon
@@ -107,8 +109,8 @@
                       notify.type === 'invoice'
                     "
                     class="mt-2 text-sm cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
-                    @click="deleteInvoiceInNotification(notify)"
-                    @keydown="deleteInvoiceInNotification(notify)"
+                    @click="deleteInvoiceInNotification(notify, $event)"
+                    @keydown="deleteInvoiceInNotification(notify, $event)"
                     tabindex="0"
                   >
                     Undo action
@@ -133,7 +135,7 @@
                     class="mt-2 text-sm cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
                     @click="deleteTransferFromNotification(notify.company, $event)
                     "
-                    @keydown="deleteTransferFromNotification(notify.company, event)"
+                    @keydown="deleteTransferFromNotification(notify.company, $event)"
                     tabindex="0"
                   >
                     Remove transfer
@@ -145,7 +147,7 @@
         </div>
         <div
           v-if="notificationStore.notifications.length > 3"
-          class="h-[2.5rem] flex justify-center items-center border-t hover:bg-gray-600 cursor-pointer duration-300"
+          class="h-[2.5rem] flex justify-center items-center border-t hover:bg-gray-600 focus-visible:bg-gray-600  cursor-pointer duration-300"
           tabindex="0"
           role="button"
         >
@@ -164,12 +166,11 @@ import {
     PopoverButton, 
     PopoverPanel,
 } from '@headlessui/vue'
-import { useDashboardStore } from "../stores/useDashboard"
+
 import { useInvoicesStore } from '../stores/useInvoice';
 import { useNotificationStore } from '../stores/useNotification';
 import { useTransferStore } from '../stores/useTransfer';
 
-const dashboard = useDashboardStore()
 const invoicesStore = useInvoicesStore()
 const notificationStore = useNotificationStore();
 const transferStore = useTransferStore();
@@ -224,6 +225,10 @@ function outputHeader(type, status) {
 
   if (type === 'transfer' && status === 'deleted') {
     return 'Transfer removed'
+  }
+
+  if (type === 'transfer' && status === 'updated') {
+    return 'Transfer updated'
   }
 
   if (type === 'account') {
