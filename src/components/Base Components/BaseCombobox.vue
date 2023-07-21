@@ -114,7 +114,6 @@ const query = ref('')
 
 function runEmit() {
   emits('emitSelectedOption', selected.value)
-  selected.value = props.dataList[0]
 }
 
 let filteredData = computed(() =>
