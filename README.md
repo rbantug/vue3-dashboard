@@ -21,7 +21,7 @@ Also, it is NOT responsive. And the (terrible) designs for the invoice, subscrip
 
 ## What I learned from this project
 
-After the code snowballed, I wish added some unit and e2e testing. It was cumbersome to constantly check everything in the dashboard after I added some new functionality. So in my next project, I would learn CI/CD and use Github actions.
+After the code snowballed, I wish I included some unit and e2e testing. It was cumbersome to constantly check everything in the dashboard after I added some new functionality. So in my next project, I would learn CI/CD and use Github actions.
 
 I also found out that I can work more efficiently if I have a to-do list of bugs to fix or things to add. So searched for solutions and I found Jira. Apparently, teams use Jira for project management. I'll learn more about that and use it in my next project.
 
