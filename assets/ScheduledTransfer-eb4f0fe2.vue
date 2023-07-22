@@ -228,14 +228,6 @@ const ScheduledTransferSuccess = defineAsyncComponent(() => import('./ScheduledT
 const transferStore = useTransferStore();
 const notificationStore = useNotificationStore()
 
-//import imageURL from '@/assets/images/avif_images/YouTube_Logo_2017.svg.avif'
-
-//const imageURL = new URL(`@/assets/images/avif_images/YouTube_Logo_2017.svg.avif`, import.meta.url).href
-
-/* function getImgUrl(imgsrc) {
-  return new URL(`@/${imgsrc}`, import.meta.url).href
-} */
-
 // Component Refs
 const scheduledTransferOptionsRef = ref(null)
 
