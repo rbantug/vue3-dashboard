@@ -41,7 +41,6 @@
 
         <ScheduledTransferOptions 
           v-if="transferStore.newTransferOptions || transferStore.editTransferOptions"
-          @emit-create-carousel-subscription="createCarouselSubscription"
           ref="scheduledTransferOptionsRef"
         />
 
@@ -115,6 +114,27 @@
       </div>
     </template>
   </BaseModal>
+
+  <!-- Warning dialog box regarding deleting subscription -->
+
+  <BaseWarningModal
+    :warning-modal-is-visible="transferStore.deleteTransferModalIsVisible"
+    @emit-yes-btn="deleteTransfer"
+    @emit-no-btn="closeDeleteTransferModal"
+    modal-height="h-[17rem]"
+    modal-width="w-[21rem]"
+    icon-color="red"
+  >
+    <template v-slot:default>
+      <span class="text-center"
+        >Do you want to remove
+        {{
+          transferStore.deleteTransferCompany || transferStore.tempSelectedSubscription.company
+        }}
+        from your list of subscriptions?</span
+      >
+    </template>
+  </BaseWarningModal>
 
   <!-- Main Component -->
 
@@ -213,6 +233,7 @@ import { Icon } from "@iconify/vue";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Navigation } from "vue3-carousel";
 import BaseModal from "./Base Components/BaseModal.vue";
+import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import { toast } from "vue3-toastify";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
 import { getImgUrl } from "../composables-and-reusable-logic/getImgUrl";
@@ -480,7 +501,7 @@ function addSubscription(type) {
 // Edit and Remove Transfer
 /////////////////////////////////////
 
-// Edit Transfer
+// ==== Edit Transfer ====
 
 const editTransferEnabled = ref(false);
 const carouselRefList = ref([])
@@ -568,6 +589,57 @@ function selectEditTransfer(sub) {
   nextTick(() => {
     transferStore.monthlyBtnRef?.focus()
   })
+}
+
+// ==== Remove Transfer ====
+
+function closeDeleteTransferModal() {
+  transferStore.closeDeleteTransferModal();
+  transferStore.deleteBtnRef.focus()
+}
+
+function deleteTransfer() {
+  // get the company name for the notification and toast
+  const companyToBeDeleted = transferStore.editTransferOptions ? 
+    transferStore.tempSelectedSubscription.company : transferStore.deleteTransferCompany;
+
+  // Remove the "Remove transfer" button from the "New transfer added notification"
+  notificationStore.removeTransferBtnFromNotification(companyToBeDeleted);
+
+  // update the carousel
+  const newCurrentSubscription = transferStore.currentSubscription.filter(
+    (sub) => sub.company !== companyToBeDeleted
+  );
+  transferStore.updateCurrentSubscription(newCurrentSubscription)
+
+  createCarouselSubscription()
+
+  // reset states to close modals
+  transferStore.updateEditTransferModalIsVisible(false)
+  transferStore.updateAddNewTransferModalIsVisible(false)
+
+  // Toast and Notification
+  toast.info(`${companyToBeDeleted} was removed from your scheduled transfer`, {
+    autoClose: 3000,
+    position: toast.POSITION.BOTTOM_RIGHT,
+    theme: "dark",
+    transition: toast.TRANSITIONS.SLIDE,
+  });
+
+  const notificationId =
+    notificationStore.lastNotificationId + Math.floor(getRandomNumber(1, 500));
+  notificationStore.updateNotifications({
+    id: notificationId,
+    type: "transfer",
+    status: "deleted",
+    company: companyToBeDeleted,
+    message: `${companyToBeDeleted} was removed from your scheduled transfer`,
+    showCancelBtn: false,
+    showRemoveBtn: false,
+  });
+  notificationStore.updateLastNotificationId(notificationId);
+
+  transferStore.closeDeleteTransferModal();
 }
 
 onMounted(() => {

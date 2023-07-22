@@ -173,7 +173,7 @@
               id="description"
               cols="30"
               rows="2"
-              class="mt-2 rounded-lg text-gray-900 text-sm focus:outline-none border-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-green-400 shadow-md resize-none duration-300"
+              class="w-[18rem] h-[3.5rem] mt-2 rounded-lg text-gray-900 text-sm focus:outline-none border-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-green-400 shadow-md resize-none duration-300"
               v-model="transferStore.descriptionVmodel"
             ></textarea>
           </div>
@@ -267,7 +267,7 @@
       </div>
     </div>
 
-    <!-- Warning dialog box regarding subscription duratrion -->
+    <!-- Warning dialog box regarding subscription duration -->
 
   <BaseWarningModal
     :warning-modal-is-visible="transferStore.warningModalIsVisible"
@@ -282,27 +282,6 @@
         >We noticed that you chose to pay per month but you're planning to pay
         for a year or more on your subscription.</span
       ><span>Do you still want to proceed?</span>
-    </template>
-  </BaseWarningModal>
-
-  <!-- Warning dialog box regarding deleting subscription -->
-
-  <BaseWarningModal
-    :warning-modal-is-visible="transferStore.deleteTransferModalIsVisible"
-    @emit-yes-btn="deleteTransfer"
-    @emit-no-btn="closeDeleteTransferModal"
-    modal-height="h-[17rem]"
-    modal-width="w-[21rem]"
-    icon-color="red"
-  >
-    <template v-slot:default>
-      <span class="text-center"
-        >Do you want to remove
-        {{
-          transferStore.deleteTransferCompany || transferStore.tempSelectedSubscription.company
-        }}
-        from your list of subscriptions?</span
-      >
     </template>
   </BaseWarningModal>
   </div>
@@ -320,10 +299,8 @@ import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 
 import { useTransferStore } from "../stores/useTransfer";
-import { useNotificationStore } from "../stores/useNotification";
 
 const transferStore = useTransferStore();
-const notificationStore = useNotificationStore();
 
 const backBtnRef = ref(null)
 
@@ -412,55 +389,6 @@ function goToSubTransactSummary() {
 function closeWarningModal() {
   transferStore.updateWarningModalIsVisible(false);
   monthlyBtnRef.value.focus();
-}
-
-function closeDeleteTransferModal() {
-  transferStore.closeDeleteTransferModal();
-  transferStore.deleteBtnRef.focus()
-}
-
-function deleteTransfer() {
-  // get the company name for the notification and toast
-  const companyToBeDeleted = transferStore.editTransferOptions ? 
-    transferStore.tempSelectedSubscription.company : transferStore.deleteTransferCompany;
-
-  // Remove the "Remove transfer" button from the "New transfer added notification"
-  notificationStore.removeTransferBtnFromNotification(companyToBeDeleted);
-
-  // update the carousel
-  const newCurrentSubscription = transferStore.currentSubscription.filter(
-    (sub) => sub.company !== companyToBeDeleted
-  );
-  transferStore.updateCurrentSubscription(newCurrentSubscription)
-
-  emits('emitCreateCarouselSubscription')
-
-  // reset states to close modals
-  transferStore.updateEditTransferModalIsVisible(false)
-  transferStore.updateAddNewTransferModalIsVisible(false)
-
-  // Toast and Notification
-  toast.info(`${companyToBeDeleted} was removed from your scheduled transfer`, {
-    autoClose: 3000,
-    position: toast.POSITION.BOTTOM_RIGHT,
-    theme: "dark",
-    transition: toast.TRANSITIONS.SLIDE,
-  });
-
-  const notificationId =
-    notificationStore.lastNotificationId + Math.floor(getRandomNumber(1, 500));
-  notificationStore.updateNotifications({
-    id: notificationId,
-    type: "transfer",
-    status: "deleted",
-    company: companyToBeDeleted,
-    message: `${companyToBeDeleted} was removed from your scheduled transfer`,
-    showCancelBtn: false,
-    showRemoveBtn: false,
-  });
-  notificationStore.updateLastNotificationId(notificationId);
-
-  transferStore.closeDeleteTransferModal();
 }
 
 defineExpose({ monthlyBtnRef })
