@@ -184,7 +184,9 @@ function showInvoicesViewAll(e) {
 }
 
 function deleteTransferFromNotification(company, e) {
-  if(e.type === "click" || e.code === "Space" || e.code === "Enter") transferStore.deleteTransferFromNotification(company)
+  if(e.type === "click" || e.code === "Space" || e.code === "Enter") {
+    transferStore.deleteTransferFromNotification(company)
+  }
 }
 
 const outputNotificationList = computed(() => {

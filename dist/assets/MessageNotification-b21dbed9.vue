@@ -48,7 +48,7 @@
                 class="relative flex flex-col items-start h-[6.5rem] w-[16rem] pl-[3rem] duration-300"
               >
               <div class="absolute left-2 top-2">
-                <img :src="msg.imageSrc" alt="" class="h-7 w-7 rounded-full">
+                <img :src="getImgUrl(msg.imageSrc)" alt="" class="h-7 w-7 rounded-full">
               </div>
               <h3 class="mt-2 mb-1 text-sm">
                 {{ msg.title }}
@@ -85,6 +85,7 @@
 import { ref, computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
+import { getImgUrl } from "../composables-and-reusable-logic/getImgUrl";
 
 import { useDashboardStore } from "../stores/useDashboard";
 import { useNotificationStore } from "../stores/useNotification";
