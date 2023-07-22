@@ -48,8 +48,7 @@
               ref="refList"
             >
               <div
-                class="relative flex flex-col items-start w-[16rem] pl-[3rem] duration-300"
-                :class="notificationHeight(notify)"
+                class="relative h-fit flex flex-col justify-between w-[16rem] pl-[3rem] duration-300"
               >
                 <div
                   class="absolute -left-1 top-0 h-11 w-11 rounded-full"
@@ -79,19 +78,21 @@
                     }"
                   />
                 </div>
-                <h3 class="mt-2 mb-1 text-sm">
-                  {{ outputHeader(notify.type, notify.status) }}
-                </h3>
-                <div class="text-sm text-gray-300">{{ notify.message }}
-                </div>
-                <div
-                  class="absolute right-0 top-2 flex justify-center items-center h-6 w-6 cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
-                  @click="removeSingleNotification(notify.id, index, $event)"
-                  @keydown="removeSingleNotification(notify.id, index, $event)" 
-                  tabindex="0" 
-                  aria-label="remove notification"
-                >
-                  <Icon icon="ic:round-close" class="h-5 w-5" />
+                <div class="flex flex-col">
+                  <h3 class="mt-2 mb-1 text-sm">
+                    {{ outputHeader(notify.type, notify.status) }}
+                  </h3>
+                  <div class="text-sm text-gray-300">{{ notify.message }}
+                  </div>
+                  <div
+                    class="absolute right-0 top-2 flex justify-center items-center h-6 w-6 cursor-pointer outline-none hover:text-yellow-400 focus-visible:text-yellow-400"
+                    @click="removeSingleNotification(notify.id, index, $event)"
+                    @keydown="removeSingleNotification(notify.id, index, $event)" 
+                    tabindex="0" 
+                    aria-label="remove notification"
+                  >
+                    <Icon icon="ic:round-close" class="h-5 w-5" />
+                  </div>
                 </div>
                 <div class="flex">
                   <div
@@ -236,22 +237,6 @@ function outputHeader(type, status) {
   if (type === 'account') {
     return 'New account added'
   }
-}
-
-function notificationHeight({ status, showCancelBtn, showRemoveBtn, type }) {
-  if (type === 'account') return 'h-[5rem]'
-
-  if (status === 'successful' && type === 'transfer' && !showRemoveBtn) return 'h-[5rem]'
-
-  if (status === 'successful' && !showCancelBtn) return 'h-[6.5rem]'
-
-  if (status === 'pending' && !showCancelBtn) return 'h-[5rem]'
-
-  if (status === 'pending' && showCancelBtn) return 'h-[6.5rem]'
-
-  if (status === 'deleted' && type === 'transfer') return 'h-[5rem]'
-  
-  if (status === 'deleted') return 'h-[3.5rem]'
 }
 
 let refList = ref([])
