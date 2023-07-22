@@ -40,7 +40,7 @@
           <td>
             <div class="col-span-2 flex items-center gap-x-2">
               <img
-                :src="invoice.clientPhoto"
+                :src="getImgUrl(invoice.clientPhoto)"
                 alt="profile picture"
                 class="h-6 w-6 object-cover rounded-full"
                 aria-hidden="true"
@@ -124,6 +124,7 @@ import { Icon } from '@iconify/vue';
 import { ref, computed, toRef } from 'vue'
 import BaseWarningModal from '../Base Components/BaseWarningModal.vue';
 import { getRandomNumber } from '../../composables-and-reusable-logic/getRandomNumber';
+import { getImgUrl } from '../../composables-and-reusable-logic/getImgUrl';
 import { toast } from "vue3-toastify";
 
 import { useInvoicesStore } from '../../stores/useInvoice';

@@ -21,7 +21,7 @@
               class="flex justify-center items-center gap-x-2 mt-2 mx-auto py-2 px-4 w-auto bg-gray-200/20 text-white rounded-xl"
             >
               <img
-                :src="transferStore.tempSelectedSubscription.icon1"
+                :src="getImgUrl(transferStore.tempSelectedSubscription.icon1)"
                 alt=""
                 class="w-20 h-10 object-contain"
                 aria-hidden="true"
@@ -64,8 +64,9 @@
 <script setup>
 import { nextTick, computed, onMounted, ref } from 'vue';
 import { Icon } from '@iconify/vue';
-import { useTransferStore } from "../stores/useTransfer";
 import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
+import { getImgUrl } from '../composables-and-reusable-logic/getImgUrl';
+import { useTransferStore } from "../stores/useTransfer";
 
 const transferStore = useTransferStore();
 

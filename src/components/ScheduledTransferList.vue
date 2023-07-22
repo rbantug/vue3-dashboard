@@ -16,7 +16,7 @@
         >
           <img
             class="object-scale-down h-9 w-16 pointer-events-none"
-            :src="company.icon1"
+            :src="getImgUrl(company.icon1)"
             alt=""
             aria-hidden="true"
           />
@@ -28,6 +28,7 @@
 
 <script setup>
 import { computed, ref, nextTick, onMounted } from 'vue'
+import { getImgUrl } from "../composables-and-reusable-logic/getImgUrl";
 import { useTransferStore } from '../stores/useTransfer';
 
 const transferStore = useTransferStore();

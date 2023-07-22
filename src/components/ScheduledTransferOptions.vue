@@ -21,7 +21,7 @@
       >
         <img
           class="object-scale-down h-12 w-24"
-          :src="transferStore.tempSelectedSubscription.icon1"
+          :src="getImgUrl(transferStore.tempSelectedSubscription.icon1)"
           alt=""
           aria-hidden="true"
         />
@@ -267,7 +267,7 @@
       </div>
     </div>
 
-    <!-- Warning dialog box regarding subscription duratrion -->
+    <!-- Warning dialog box regarding subscription duration -->
 
   <BaseWarningModal
     :warning-modal-is-visible="transferStore.warningModalIsVisible"
@@ -284,27 +284,6 @@
       ><span>Do you still want to proceed?</span>
     </template>
   </BaseWarningModal>
-
-  <!-- Warning dialog box regarding deleting subscription -->
-
-  <BaseWarningModal
-    :warning-modal-is-visible="transferStore.deleteTransferModalIsVisible"
-    @emit-yes-btn="deleteTransfer"
-    @emit-no-btn="closeDeleteTransferModal"
-    modal-height="h-[17rem]"
-    modal-width="w-[21rem]"
-    icon-color="red"
-  >
-    <template v-slot:default>
-      <span class="text-center"
-        >Do you want to remove
-        {{
-          transferStore.deleteTransferCompany || transferStore.tempSelectedSubscription.company
-        }}
-        from your list of subscriptions?</span
-      >
-    </template>
-  </BaseWarningModal>
   </div>
 </template>
 
@@ -314,6 +293,8 @@ import { Icon } from "@iconify/vue";
 import { toast } from "vue3-toastify";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
 import { outputLast4CardNum } from "../composables-and-reusable-logic/outputLast4CardNum";
+import { getImgUrl } from "../composables-and-reusable-logic/getImgUrl";
+
 import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 
@@ -410,55 +391,6 @@ function goToSubTransactSummary() {
 function closeWarningModal() {
   transferStore.updateWarningModalIsVisible(false);
   monthlyBtnRef.value.focus();
-}
-
-function closeDeleteTransferModal() {
-  transferStore.closeDeleteTransferModal();
-  transferStore.deleteBtnRef.focus()
-}
-
-function deleteTransfer() {
-  // get the company name for the notification and toast
-  const companyToBeDeleted = transferStore.editTransferOptions ? 
-    transferStore.tempSelectedSubscription.company : transferStore.deleteTransferCompany;
-
-  // Remove the "Remove transfer" button from the "New transfer added notification"
-  notificationStore.removeTransferBtnFromNotification(companyToBeDeleted);
-
-  // update the carousel
-  const newCurrentSubscription = transferStore.currentSubscription.filter(
-    (sub) => sub.company !== companyToBeDeleted
-  );
-  transferStore.updateCurrentSubscription(newCurrentSubscription)
-
-  emits('emitCreateCarouselSubscription')
-
-  // reset states to close modals
-  transferStore.updateEditTransferModalIsVisible(false)
-  transferStore.updateAddNewTransferModalIsVisible(false)
-
-  // Toast and Notification
-  toast.info(`${companyToBeDeleted} was removed from your scheduled transfer`, {
-    autoClose: 3000,
-    position: toast.POSITION.BOTTOM_RIGHT,
-    theme: "dark",
-    transition: toast.TRANSITIONS.SLIDE,
-  });
-
-  const notificationId =
-    notificationStore.lastNotificationId + Math.floor(getRandomNumber(1, 500));
-  notificationStore.updateNotifications({
-    id: notificationId,
-    type: "transfer",
-    status: "deleted",
-    company: companyToBeDeleted,
-    message: `${companyToBeDeleted} was removed from your scheduled transfer`,
-    showCancelBtn: false,
-    showRemoveBtn: false,
-  });
-  notificationStore.updateLastNotificationId(notificationId);
-
-  transferStore.closeDeleteTransferModal();
 }
 
 defineExpose({ monthlyBtnRef })

@@ -32,7 +32,7 @@
               >
                 <template v-slot:comboboxItem="slotObj">
                   <img
-                    :src="slotObj.slotData.photo"
+                    :src="getImgUrl(slotObj.slotData.photo)"
                     alt="client photo"
                     class="object-fit rounded-full h-7 w-7"
                     aria-hidden="true"
@@ -113,6 +113,7 @@ import { ref } from "vue";
 import BaseModal from "./Base Components/BaseModal.vue";
 import BaseCombobox from "./Base Components/BaseCombobox.vue";
 import { getRandomNumber } from "../composables-and-reusable-logic/getRandomNumber";
+import { getImgUrl } from "../composables-and-reusable-logic/getImgUrl";
 import { toast } from "vue3-toastify";
 
 import { useInvoicesStore } from "../stores/useInvoice";
