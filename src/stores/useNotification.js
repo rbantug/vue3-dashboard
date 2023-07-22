@@ -65,28 +65,28 @@ const msgNotification = [
     title: "message 1",
     message:
       "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, error!",
-    imageSrc: "src/assets/images/bird.jpg",
+    imageSrc: "assets/images/avif_images/bird.avif",
   },
   {
     id: 1001,
     title: "message 2",
     message:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum excepturi quae illo!",
-    imageSrc: "src/assets/images/frog.jpg",
+    imageSrc: "assets/images/avif_images/frog.avif",
   },
   {
     id: 1002,
     title: "message 3",
     message:
       "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minima, odit esse omnis recusandae odio amet.",
-    imageSrc: "src/assets/images/cow.jpg",
+    imageSrc: "assets/images/avif_images/cow.avif",
   },
   {
     id: 1003,
     title: "message 4",
     message:
       "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Minima, odit esse omnis recusandae odio amet.",
-    imageSrc: "src/assets/images/axolotl.jpg",
+    imageSrc: "assets/images/avif_images/axolotl.avif",
   },
 ];
 
