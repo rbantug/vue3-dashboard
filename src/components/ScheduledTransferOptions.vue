@@ -173,7 +173,7 @@
               id="description"
               cols="30"
               rows="2"
-              class="mt-2 rounded-lg text-gray-900 text-sm focus:outline-none border-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-green-400 shadow-md resize-none duration-300"
+              class="w-[18rem] h-[3.5rem] mt-2 rounded-lg text-gray-900 text-sm focus:outline-none border-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-green-400 shadow-md resize-none duration-300"
               v-model="transferStore.descriptionVmodel"
             ></textarea>
           </div>
@@ -299,10 +299,8 @@ import BaseWarningModal from "./Base Components/BaseWarningModal.vue";
 import HeadlessUIListBox from "./Base Components/HeadlessUIListBox.vue";
 
 import { useTransferStore } from "../stores/useTransfer";
-import { useNotificationStore } from "../stores/useNotification";
 
 const transferStore = useTransferStore();
-const notificationStore = useNotificationStore();
 
 const backBtnRef = ref(null)
 
