@@ -23,7 +23,7 @@ Also, it is NOT responsive. And the (terrible) designs for the invoice, subscrip
 
 After the code snowballed, I wish I included some unit and e2e testing. It was cumbersome to constantly check everything in the dashboard after I added a new functionality. So in my next project, I would learn CI/CD and use Github actions.
 
-I also found out that I can work more efficiently if I have a to-do list of bugs to fix or things to add. So searched for solutions and I found Jira. Apparently, teams use Jira for project management. I'll learn more about that and use it in my next project.
+I also found out that I can work more efficiently if I have a to-do list of bugs to fix or things to add. So I searched for solutions and I found Jira. Apparently, teams use Jira for project management. I'll learn more about that and use it in my next project.
 
 Lastly, making accessibility work on different screen readers and browsers is frustrating. It also adds a big chunk of code to an already long codebase. But despite that, I'll keep on implementing a11y. It's a pain but it has to be done.
 
