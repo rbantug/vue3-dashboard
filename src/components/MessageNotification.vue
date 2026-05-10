@@ -111,7 +111,7 @@ let refList = ref([])
 function removeSingleMessage(id, index, e) {
 
   if(e.type === "click" || e.code === "Space" || e.code === "Enter") {    
-    dashboard.removeMessage(id)
+    notificationStore.removeMessage(id)
     let msgIndex = notificationStore.msgNotification.length === index ? notificationStore.msgNotification.length - 1 : index
     refList.value[msgIndex].children[0].removeAttribute('aria-live')
     refList.value[msgIndex].children[0].setAttribute('aria-live', 'assertive')
